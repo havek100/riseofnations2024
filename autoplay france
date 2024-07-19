@@ -229,3 +229,39 @@ local args = {
 }
 
 workspace:WaitForChild("GameManager"):WaitForChild("CreateBuilding"):FireServer(unpack(args))
+wait(1)
+local args = {
+    [1] = {
+        [1] = workspace:WaitForChild("Baseplate"):WaitForChild("Cities"):WaitForChild("France"):WaitForChild("Besançon")
+    },
+    [2] = "Fertilizer Factory"
+}
+
+workspace:WaitForChild("GameManager"):WaitForChild("CreateBuilding"):FireServer(unpack(args))
+wait(1)
+local args = {
+    [1] = {
+        [1] = workspace:WaitForChild("Baseplate"):WaitForChild("Cities"):WaitForChild("France"):WaitForChild("Paris")
+    },
+    [2] = "Civilian Factory"
+}
+
+workspace:WaitForChild("GameManager"):WaitForChild("CreateBuilding"):FireServer(unpack(args))
+wait(1)
+local args = {
+    [1] = {
+        [1] = workspace:WaitForChild("Baseplate"):WaitForChild("Cities"):WaitForChild("France"):WaitForChild("Marseille")
+    },
+    [2] = "Civilian Factory"
+}
+
+workspace:WaitForChild("GameManager"):WaitForChild("CreateBuilding"):FireServer(unpack(args))
+wait(1)
+local args = {
+    [1] = {
+        [1] = workspace:WaitForChild("Baseplate"):WaitForChild("Cities"):WaitForChild("France"):WaitForChild("Lyon")
+    },
+    [2] = "Civilian Factory"
+}
+
+workspace:WaitForChild("GameManager"):WaitForChild("CreateBuilding"):FireServer(unpack(args))

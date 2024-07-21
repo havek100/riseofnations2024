@@ -1,0 +1,96 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/deeeity/mercury-lib/master/src.lua"))()
+local Mercury = loadstring(game:HttpGet("https://raw.githubusercontent.com/deeeity/mercury-lib/master/src.lua"))()
+local GUI = Mercury:Create{
+    Name = "Rise of Nations",
+    Size = UDim2.fromOffset(600, 400),
+    Theme = Mercury.Themes.Dark,
+    Link = "https://github.com/deeeity/mercury-lib"
+}
+local Tab = GUI:Tab{
+	Name = "Buy Resources",
+	Icon = "rbxassetid://10511856020"
+}
+Tab:Button{
+	Name = "Mass Buy Copper and Gold",
+	Description = nil,
+	Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/mass%20buy%20cooper%20and%20gold"))()
+ end
+}
+Tab:Button{
+	Name = "Mass Buy Iron",
+	Description = nil,
+	Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/mass%20buy%20ironr%20and%20gold"))()
+ end
+}
+Tab:Button{
+	Name = "Mass Buy Phosphate",
+	Description = nil,
+	Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/mass%20buy%20phosphate"))()
+ end
+}
+Tab:Button{
+	Name = "Mass Buy Titanium",
+	Description = nil,
+	Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/mass%20buy%20titanium"))()
+ end
+}
+Tab:Button{
+	Name = "Mass Buy Tungsten",
+	Description = nil,
+	Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/mass%20buy%20tungsten"))()
+ end
+}
+local Tab = GUI:Tab{
+	Name = "Sell Resources",
+	Icon = "rbxassetid://10511856020"
+}
+Tab:Button{
+	Name = "Sell Electronics",
+	Description = nil,
+	Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/sell%20electronics"))()
+ end
+}
+Tab:Button{
+	Name = "Sell Consumer Goods",
+	Description = nil,
+	Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/sell%20consumer%20goods"))()
+ end
+}
+local Tab = GUI:Tab{
+	Name = "Misc",
+	Icon = "rbxassetid://10511856020"
+}
+Tab:Button{
+	Name = "Clear Alerts",
+	Description = nil,
+	Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek99/riseofnationsscript/main/auto%20clear%20future%20notifications"))()
+ end
+}
+local Tab = GUI:Tab{
+	Name = "Auto Play",
+	Icon = "rbxassetid://10511856020"
+}
+Tab:Toggle{
+	Name = "France",
+	StartingState = false,
+	Description = nil,
+	Callback = function(state)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/autoplay%20france"))()
+ end
+}
+Tab:Toggle{
+	Name = "Turkey",
+	StartingState = false,
+	Description = nil,
+	Callback = function(state)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/autoplay%20turkey"))()
+ end
+}

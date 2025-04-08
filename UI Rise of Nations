@@ -77,6 +77,14 @@ local Button = Tab:CreateButton({
 })
 local Tab = Window:CreateTab("Auto Play", 4483362460) -- Title, Image
 Tab:Toggle{
+	Name = "Auto Play (ALL COUNTRIES)",
+	StartingState = false,
+	Description = nil,
+	Callback = function(state)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/refs/heads/main/autoplay"))()
+ end
+}
+Tab:Toggle{
 	Name = "France",
 	StartingState = false,
 	Description = nil,

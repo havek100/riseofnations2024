@@ -1,1704 +1,223 @@
-wait(1)
-local args = {
-   [1] = "Afghanistan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 7.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Albania",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Algeria",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 10.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Angola",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 7.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Argentina",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 15.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Australia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 9,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Austria",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.1,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Azerbaijan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Bangladesh",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 13.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Belarus",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Belgium",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Bolivia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Brazil",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 138,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Bulgaria",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Burkina Faso",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Burma",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Cambodia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Cameroon",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Canada",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 11.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Chad",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.1,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Chile",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 9.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "China",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 142.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Colombia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 18.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Cote d'Ivoire",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Cuba",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Czech Republic",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Democratic Republic Of The Congo",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 11,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Dominican Republic",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Ecuador",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Egypt",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 23.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "El Salvador",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.1,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Ethiopia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Finland",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "France",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 21.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Georgia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Germany",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 26.1,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Ghana",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Greece",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Guatemala",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Guinea",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.9,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Haiti",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Hong Kong",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Hungary",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "India",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 190,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Indonesia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 23.9,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Iran",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 16.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Iraq",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 10.1,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Ireland",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Israel",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 7.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Italy",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 15.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Jamaica",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Japan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 16.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Jordan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Kazakhstan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Kenya",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 9.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Kuwait",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Laos",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Latvia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.1,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Lebanon",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Libya",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Lithuania",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Luxembourg",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Madagascar",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Malawi",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Malaysia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 7.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Mali",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Mexico",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 52.1,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Mongolia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Montenegro",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Morocco",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Mozambique",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 6.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Namibia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Nepal",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Netherlands",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 11,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "New Zealand",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Nicaragua",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Niger",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 6.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Nigeria",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 23.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "North Macedonia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.1,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Norway",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Pakistan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 16.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Palestine",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Panama",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Papua New Guinea",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Paraguay",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Peru",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 6.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Philippines",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 20.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Poland",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 10.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Portugal",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Puerto Rico",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Qatar",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Romania",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Russia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 17.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Rwanda",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Saudi Arabia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Senegal",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Serbia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Sierra Leone",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Singapore",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Slovakia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Slovenia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Solomon Islands",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Somalia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "South Africa",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "South Korea",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 11.7,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "South Sudan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Spain",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 14.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Sri Lanka",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Sudan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 4.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Suriname",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Sweden",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Switzerland",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Syria",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Taiwan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 12.9,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Tajikistan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Thailand",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 7.8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Togo",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.9,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Tunisia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Turkey",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 10.4,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Turkmenistan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Uganda",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "United Arab Emirates",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 3.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "United Kingdom",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 14.1 ,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "United States",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 162,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Uruguay",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2.3,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Uzbekistan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 6.6,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Venezuela",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 7.9,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Vietnam",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Yemen",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Zambia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 2,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Zimbabwe",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Consumer Goods",
-       [2] = "Sell",
-       [3] = 8,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
+--[[
+    Script de Venda de Bens de Consumo (v5 - Método Reverso: Não Vender para Players)
+
+    Objetivo: Vender "Consumer Goods" automaticamente para todas as nações listadas,
+              EXCETO aquelas que estão sendo controladas por jogadores humanos no servidor.
+              Usa o atributo "Country" no Player para detectar nações controladas.
+
+    AVISO: Usar scripts para automação viola os Termos de Serviço do Roblox
+    e as regras de Rise of Nations. Risco de banimento. Use por sua conta e risco.
+]]
+
+-- Serviços e Atalhos Principais
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players") -- Serviço para listar jogadores
+
+local localPlayer = Players.LocalPlayer -- O próprio jogador (para não vender para si mesmo, embora a lógica já cubra isso)
+
+local GameManager = Workspace:WaitForChild("GameManager")
+local ManageAllianceRemote = GameManager:WaitForChild("ManageAlliance") -- Remote para trocas
+
+-- Função Auxiliar para Executar Ações (Reutilizada)
+local function executarAcao(remoteEvent, arguments, delayTime)
+    if not remoteEvent then
+        warn("Tentativa de usar um RemoteEvent inválido.")
+        return
+    end
+    local success, err = pcall(function()
+        remoteEvent:FireServer(unpack(arguments))
+    end)
+    if not success then
+        warn(string.format("Erro ao executar ação para %s: %s", remoteEvent.Name, tostring(err)))
+    end
+    task.wait(delayTime or 1) -- Espera 1 segundo por padrão
+end
+
+-- ===================================
+-- DADOS DAS VENDAS TOTAIS (Potenciais)
+-- ===================================
+-- Tabela contendo os detalhes de cada venda POTENCIAL. Usa o NOME BASE da nação.
+local vendasPotenciais = {
+    { nation = "Afghanistan", resource = "Consumer Goods", quantity = 7.2, price = 1 },
+    { nation = "Albania", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Algeria", resource = "Consumer Goods", quantity = 10.7, price = 1 },
+    { nation = "Angola", resource = "Consumer Goods", quantity = 7.8, price = 1 },
+    { nation = "Argentina", resource = "Consumer Goods", quantity = 15.4, price = 1 },
+    { nation = "Australia", resource = "Consumer Goods", quantity = 9, price = 1 },
+    { nation = "Austria", resource = "Consumer Goods", quantity = 4.1, price = 1 },
+    { nation = "Azerbaijan", resource = "Consumer Goods", quantity = 3.7, price = 1 },
+    { nation = "Bangladesh", resource = "Consumer Goods", quantity = 13.4, price = 1 },
+    { nation = "Belarus", resource = "Consumer Goods", quantity = 3.4, price = 1 },
+    { nation = "Belgium", resource = "Consumer Goods", quantity = 3, price = 1 },
+    { nation = "Bolivia", resource = "Consumer Goods", quantity = 5.2, price = 1 },
+    { nation = "Brazil", resource = "Consumer Goods", quantity = 138, price = 1 },
+    { nation = "Bulgaria", resource = "Consumer Goods", quantity = 3.3, price = 1 },
+    { nation = "Burkina Faso", resource = "Consumer Goods", quantity = 3.3, price = 1 },
+    { nation = "Burma", resource = "Consumer Goods", quantity = 5.8, price = 1 },
+    { nation = "Cambodia", resource = "Consumer Goods", quantity = 2, price = 1 },
+    { nation = "Cameroon", resource = "Consumer Goods", quantity = 4.3, price = 1 },
+    { nation = "Canada", resource = "Consumer Goods", quantity = 11.3, price = 1 },
+    { nation = "Chad", resource = "Consumer Goods", quantity = 2.1, price = 1 },
+    { nation = "Chile", resource = "Consumer Goods", quantity = 9.7, price = 1 },
+    { nation = "China", resource = "Consumer Goods", quantity = 142.4, price = 1 },
+    { nation = "Colombia", resource = "Consumer Goods", quantity = 18.6, price = 1 },
+    { nation = "Cote d'Ivoire", resource = "Consumer Goods", quantity = 4.3, price = 1 },
+    { nation = "Cuba", resource = "Consumer Goods", quantity = 3.2, price = 1 },
+    { nation = "Czech Republic", resource = "Consumer Goods", quantity = 2.5, price = 1 },
+    { nation = "Democratic Republic Of The Congo", resource = "Consumer Goods", quantity = 11, price = 1 },
+    { nation = "Dominican Republic", resource = "Consumer Goods", quantity = 3.6, price = 1 },
+    { nation = "Ecuador", resource = "Consumer Goods", quantity = 4.2, price = 1 },
+    { nation = "Egypt", resource = "Consumer Goods", quantity = 23.3, price = 1 },
+    { nation = "El Salvador", resource = "Consumer Goods", quantity = 2.1, price = 1 },
+    { nation = "Ethiopia", resource = "Consumer Goods", quantity = 4.8, price = 1 },
+    { nation = "Finland", resource = "Consumer Goods", quantity = 2.7, price = 1 },
+    { nation = "France", resource = "Consumer Goods", quantity = 21.7, price = 1 },
+    { nation = "Georgia", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Germany", resource = "Consumer Goods", quantity = 26.1, price = 1 },
+    { nation = "Ghana", resource = "Consumer Goods", quantity = 5.6, price = 1 },
+    { nation = "Greece", resource = "Consumer Goods", quantity = 4.5, price = 1 },
+    { nation = "Guatemala", resource = "Consumer Goods", quantity = 2.5, price = 1 },
+    { nation = "Guinea", resource = "Consumer Goods", quantity = 4.9, price = 1 },
+    { nation = "Haiti", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Hong Kong", resource = "Consumer Goods", quantity = 5.3, price = 1 },
+    { nation = "Hungary", resource = "Consumer Goods", quantity = 3, price = 1 },
+    { nation = "India", resource = "Consumer Goods", quantity = 190, price = 1 },
+    { nation = "Indonesia", resource = "Consumer Goods", quantity = 23.9, price = 1 },
+    { nation = "Iran", resource = "Consumer Goods", quantity = 16.4, price = 1 },
+    { nation = "Iraq", resource = "Consumer Goods", quantity = 10.1, price = 1 },
+    { nation = "Ireland", resource = "Consumer Goods", quantity = 3.6, price = 1 },
+    { nation = "Israel", resource = "Consumer Goods", quantity = 7.8, price = 1 },
+    { nation = "Italy", resource = "Consumer Goods", quantity = 15.4, price = 1 },
+    { nation = "Jamaica", resource = "Consumer Goods", quantity = 2.5, price = 1 },
+    { nation = "Japan", resource = "Consumer Goods", quantity = 16.2, price = 1 },
+    { nation = "Jordan", resource = "Consumer Goods", quantity = 3.6, price = 1 },
+    { nation = "Kazakhstan", resource = "Consumer Goods", quantity = 5.3, price = 1 },
+    { nation = "Kenya", resource = "Consumer Goods", quantity = 9.5, price = 1 },
+    { nation = "Kuwait", resource = "Consumer Goods", quantity = 4, price = 1 },
+    { nation = "Laos", resource = "Consumer Goods", quantity = 2.3, price = 1 },
+    { nation = "Latvia", resource = "Consumer Goods", quantity = 2.1, price = 1 },
+    { nation = "Lebanon", resource = "Consumer Goods", quantity = 2.8, price = 1 },
+    { nation = "Libya", resource = "Consumer Goods", quantity = 4.7, price = 1 },
+    { nation = "Lithuania", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Luxembourg", resource = "Consumer Goods", quantity = 2.2, price = 1 },
+    { nation = "Madagascar", resource = "Consumer Goods", quantity = 3.7, price = 1 },
+    { nation = "Malawi", resource = "Consumer Goods", quantity = 4.2, price = 1 },
+    { nation = "Malaysia", resource = "Consumer Goods", quantity = 7.3, price = 1 },
+    { nation = "Mali", resource = "Consumer Goods", quantity = 2.7, price = 1 },
+    { nation = "Mexico", resource = "Consumer Goods", quantity = 52.1, price = 1 },
+    { nation = "Mongolia", resource = "Consumer Goods", quantity = 3.7, price = 1 },
+    { nation = "Montenegro", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Morocco", resource = "Consumer Goods", quantity = 4.7, price = 1 },
+    { nation = "Mozambique", resource = "Consumer Goods", quantity = 6.6, price = 1 },
+    { nation = "Namibia", resource = "Consumer Goods", quantity = 3, price = 1 },
+    { nation = "Nepal", resource = "Consumer Goods", quantity = 4.5, price = 1 },
+    { nation = "Netherlands", resource = "Consumer Goods", quantity = 11, price = 1 },
+    { nation = "New Zealand", resource = "Consumer Goods", quantity = 2.8, price = 1 },
+    { nation = "Nicaragua", resource = "Consumer Goods", quantity = 2.3, price = 1 },
+    { nation = "Niger", resource = "Consumer Goods", quantity = 6.2, price = 1 },
+    { nation = "Nigeria", resource = "Consumer Goods", quantity = 23.2, price = 1 },
+    { nation = "North Macedonia", resource = "Consumer Goods", quantity = 2.1, price = 1 },
+    { nation = "Norway", resource = "Consumer Goods", quantity = 2.6, price = 1 },
+    { nation = "Pakistan", resource = "Consumer Goods", quantity = 16.4, price = 1 },
+    { nation = "Palestine", resource = "Consumer Goods", quantity = 2.3, price = 1 },
+    { nation = "Panama", resource = "Consumer Goods", quantity = 3, price = 1 },
+    { nation = "Papua New Guinea", resource = "Consumer Goods", quantity = 3.3, price = 1 },
+    { nation = "Paraguay", resource = "Consumer Goods", quantity = 2.7, price = 1 },
+    { nation = "Peru", resource = "Consumer Goods", quantity = 6.8, price = 1 },
+    { nation = "Philippines", resource = "Consumer Goods", quantity = 20.2, price = 1 },
+    { nation = "Poland", resource = "Consumer Goods", quantity = 10.5, price = 1 },
+    { nation = "Portugal", resource = "Consumer Goods", quantity = 4.8, price = 1 },
+    { nation = "Puerto Rico", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Qatar", resource = "Consumer Goods", quantity = 3.8, price = 1 },
+    { nation = "Romania", resource = "Consumer Goods", quantity = 3.3, price = 1 },
+    { nation = "Russia", resource = "Consumer Goods", quantity = 17.6, price = 1 },
+    { nation = "Rwanda", resource = "Consumer Goods", quantity = 4.2, price = 1 },
+    { nation = "Saudi Arabia", resource = "Consumer Goods", quantity = 5.6, price = 1 },
+    { nation = "Senegal", resource = "Consumer Goods", quantity = 3.2, price = 1 },
+    { nation = "Serbia", resource = "Consumer Goods", quantity = 3.4, price = 1 },
+    { nation = "Sierra Leone", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Singapore", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Slovakia", resource = "Consumer Goods", quantity = 2.7, price = 1 },
+    { nation = "Slovenia", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Solomon Islands", resource = "Consumer Goods", quantity = 2.3, price = 1 },
+    { nation = "Somalia", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "South Africa", resource = "Consumer Goods", quantity = 5.3, price = 1 },
+    { nation = "South Korea", resource = "Consumer Goods", quantity = 11.7, price = 1 },
+    { nation = "South Sudan", resource = "Consumer Goods", quantity = 2.4, price = 1 },
+    { nation = "Spain", resource = "Consumer Goods", quantity = 14.5, price = 1 },
+    { nation = "Sri Lanka", resource = "Consumer Goods", quantity = 3.6, price = 1 },
+    { nation = "Sudan", resource = "Consumer Goods", quantity = 4.2, price = 1 },
+    { nation = "Suriname", resource = "Consumer Goods", quantity = 2.3, price = 1 },
+    { nation = "Sweden", resource = "Consumer Goods", quantity = 2.8, price = 1 },
+    { nation = "Switzerland", resource = "Consumer Goods", quantity = 2.3, price = 1 },
+    { nation = "Syria", resource = "Consumer Goods", quantity = 5.6, price = 1 },
+    { nation = "Taiwan", resource = "Consumer Goods", quantity = 12.9, price = 1 },
+    { nation = "Tajikistan", resource = "Consumer Goods", quantity = 5.5, price = 1 },
+    { nation = "Thailand", resource = "Consumer Goods", quantity = 7.8, price = 1 },
+    { nation = "Togo", resource = "Consumer Goods", quantity = 2.9, price = 1 },
+    { nation = "Tunisia", resource = "Consumer Goods", quantity = 5.4, price = 1 },
+    { nation = "Turkey", resource = "Consumer Goods", quantity = 10.4, price = 1 },
+    { nation = "Turkmenistan", resource = "Consumer Goods", quantity = 2.2, price = 1 },
+    { nation = "Uganda", resource = "Consumer Goods", quantity = 2.2, price = 1 },
+    { nation = "United Arab Emirates", resource = "Consumer Goods", quantity = 3.3, price = 1 },
+    { nation = "United Kingdom", resource = "Consumer Goods", quantity = 14.1, price = 1 },
+    { nation = "United States", resource = "Consumer Goods", quantity = 162, price = 1 },
+    { nation = "Uruguay", resource = "Consumer Goods", quantity = 2.3, price = 1 },
+    { nation = "Uzbekistan", resource = "Consumer Goods", quantity = 6.6, price = 1 },
+    { nation = "Venezuela", resource = "Consumer Goods", quantity = 7.9, price = 1 },
+    { nation = "Vietnam", resource = "Consumer Goods", quantity = 5, price = 1 },
+    { nation = "Yemen", resource = "Consumer Goods", quantity = 2, price = 1 },
+    { nation = "Zambia", resource = "Consumer Goods", quantity = 2, price = 1 },
+    { nation = "Zimbabwe", resource = "Consumer Goods", quantity = 8, price = 1 },
+}
+
+-- ========================================================
+-- LOOP PRINCIPAL DE VENDAS (COM VERIFICAÇÃO DE PLAYERS)
+-- ========================================================
+print(string.format("[SCRIPT] Iniciando ciclo de vendas de '%s', pulando nações controladas por players...", vendasPotenciais[1] and vendasPotenciais[1].resource or "N/A"))
+local vendasFeitas = 0
+local vendasPuladas = 0
+
+for i, vendaInfo in ipairs(vendasPotenciais) do
+    local targetNationName = vendaInfo.nation
+    local isPlayerControlled = false
+
+    -- Verifica se algum jogador no servidor controla esta nação
+    local currentPlayers = Players:GetPlayers()
+    for _, player in ipairs(currentPlayers) do
+        if player ~= localPlayer then -- Não precisa verificar o próprio jogador
+            local playerNation = player:GetAttribute("Country") -- Usa o atributo "Country"
+            if playerNation and playerNation == targetNationName then
+                isPlayerControlled = true
+                -- print(string.format("  -> Pulando %s (Controlado por: %s)", targetNationName, player.Name)) -- Log opcional
+                vendasPuladas = vendasPuladas + 1
+                break -- Encontrou um jogador, não precisa verificar os outros
+            end
+        end
+    end
+
+    -- Se NENHUM jogador controla a nação, tenta vender (assume IA ou vazia)
+    if not isPlayerControlled then
+        -- print(string.format("  -> %s não é controlada por jogador. Tentando vender...", targetNationName)) -- Log opcional
+
+        -- Monta os argumentos usando o NOME BASE da nação
+        local args = {
+            targetNationName,           -- Nome Base da Nação (ex: "Egypt")
+            "ResourceTrade",            -- Tipo de Ação
+            {                           -- Detalhes da Troca
+                vendaInfo.resource,     -- Recurso
+                "Sell",                 -- Ação (Vender)
+                vendaInfo.quantity,     -- Quantidade
+                vendaInfo.price,        -- Preço
+                "Trade"                 -- Tipo/Confirmação
+            }
+        }
+
+        -- Executa a ação
+        executarAcao(ManageAllianceRemote, args)
+        vendasFeitas = vendasFeitas + 1
+    end
+end
+
+print(string.format("[SCRIPT] Ciclo de vendas concluído. Vendas tentadas: %d. Vendas puladas (players): %d.", vendasFeitas, vendasPuladas))
+-- Fim do Script

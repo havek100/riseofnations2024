@@ -1,0 +1,150 @@
+--[[
+    Script Refatorado para Rise of Nations (v4 - Correção Atributo "Country")
+
+    Objetivo: Automatizar uma sequência de ações:
+    - Comprar recursos específicos de certas nações.
+    - Iniciar pesquisas de tecnologias específicas.
+    - Construir edifícios específicos em CIDADES ALEATÓRIAS da nação ATUAL do jogador.
+
+    AVISO: Usar scripts para automação viola os Termos de Serviço do Roblox
+    e as regras de Rise of Nations. Risco de banimento. Use por sua conta e risco.
+]]
+
+-- Serviços e Atalhos Principais
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+
+local localPlayer = Players.LocalPlayer -- Objeto do jogador atual
+
+local GameManager = Workspace:WaitForChild("GameManager")
+local Baseplate = Workspace:WaitForChild("Baseplate")
+local Assets = ReplicatedStorage:WaitForChild("Assets")
+local TechnologyFolder = Assets:WaitForChild("Technology")
+local CitiesFolder = Baseplate:FindFirstChild("Cities", 5)
+
+-- Referências aos RemoteEvents
+local ManageAllianceRemote = GameManager:WaitForChild("ManageAlliance")
+local ChangeLawRemote = GameManager:WaitForChild("ChangeLaw")
+local CreateBuildingRemote = GameManager:WaitForChild("CreateBuilding")
+
+-- Função Auxiliar para Executar Ações
+local function executarAcao(remoteEvent, arguments, delayTime)
+    if not remoteEvent then
+        warn("Tentativa de usar um RemoteEvent inválido.")
+        return
+    end
+    local success, err = pcall(function()
+        remoteEvent:FireServer(unpack(arguments))
+    end)
+    if not success then
+        warn(string.format("Erro ao executar ação para %s: %s", remoteEvent.Name, tostring(err)))
+    end
+    task.wait(delayTime or 1)
+end
+
+-- ===================================
+-- 1. COMPRAR RECURSOS
+-- ===================================
+print("[SCRIPT] Iniciando compras de recursos...")
+local trocasParaExecutar = {
+    {nation = "Chile", resource = "Copper", quantity = 3, price = 1}, {nation = "Kazakhstan", resource = "Copper", quantity = 3, price = 1},
+    {nation = "Zimbabwe", resource = "Gold", quantity = 3, price = 1}, {nation = "Canada", resource = "Gold", quantity = 3, price = 1}, {nation = "Ghana", resource = "Gold", quantity = 3, price = 1},
+    {nation = "Australia", resource = "Titanium", quantity = 3, price = 1}, {nation = "Norway", resource = "Titanium", quantity = 3, price = 1},
+    {nation = "Bolivia", resource = "Tungsten", quantity = 2, price = 1}, {nation = "Vietnam", resource = "Tungsten", quantity = 3, price = 1},
+    {nation = "Tunisia", resource = "Phosphate", quantity = 3, price = 1}, {nation = "Algeria", resource = "Phosphate", quantity = 3, price = 1},
+}
+for _, tradeInfo in ipairs(trocasParaExecutar) do
+    local args = {tradeInfo.nation, "ResourceTrade", {tradeInfo.resource, "Buy", tradeInfo.quantity, tradeInfo.price, "Trade"}}
+    executarAcao(ManageAllianceRemote, args)
+end
+print("[SCRIPT] Compras de recursos concluídas.")
+
+-- ===================================
+-- 2. PESQUISAR TECNOLOGIAS
+-- ===================================
+print("[SCRIPT] Iniciando pesquisas...")
+local nomesTecnologias = {"Economic Improvements", "Factory Output 1", "Factory Output 2"}
+for _, nomeTech in ipairs(nomesTecnologias) do
+    local techObj = TechnologyFolder:FindFirstChild(nomeTech)
+    if techObj then
+        local args = {"Research", techObj}
+        executarAcao(ChangeLawRemote, args)
+    else
+        warn(string.format("Tecnologia '%s' não encontrada.", nomeTech))
+    end
+end
+print("[SCRIPT] Pesquisas concluídas.")
+
+-- ===================================
+-- 3. CONSTRUIR EDIFÍCIOS (Nação Automática, Cidades Aleatórias)
+-- ===================================
+print("[SCRIPT] Preparando construções em cidades aleatórias...")
+
+-- Tentar detectar a nação do jogador usando o atributo "Country"
+local playerNationName = nil
+if localPlayer then
+    -- --- CORREÇÃO APLICADA AQUI ---
+    playerNationName = localPlayer:GetAttribute("Country") -- Mudado de "Nation" para "Country"
+else
+    warn("[SCRIPT] Não foi possível encontrar o jogador local.")
+end
+
+local PlayerNationCitiesFolder = nil
+if playerNationName and CitiesFolder then
+    print(string.format("[SCRIPT] Nação detectada via atributo 'Country': '%s'. Procurando pasta de cidades...", playerNationName))
+    PlayerNationCitiesFolder = CitiesFolder:FindFirstChild(playerNationName, 5)
+else
+    if not playerNationName then
+        warn("[SCRIPT] Não foi possível detectar o nome da nação do jogador a partir do atributo 'Country'.")
+    end
+    if not CitiesFolder then
+        warn("[SCRIPT] Pasta principal 'Cities' não encontrada na Baseplate.")
+    end
+end
+
+-- Lista de edifícios para construir
+local edificiosParaConstruir = {
+    "Electronics Factory", "Motor Factory", "Steel Manufactory", "Fertilizer Factory",
+    "Civilian Factory", "Civilian Factory", "Civilian Factory"
+}
+
+-- Obter todas as cidades da pasta da nação (se encontrada)
+local todasCidadesDaNacao = {}
+if PlayerNationCitiesFolder then
+    for _, child in ipairs(PlayerNationCitiesFolder:GetChildren()) do
+        table.insert(todasCidadesDaNacao, child)
+    end
+    print(string.format("[SCRIPT] Encontradas %d cidades em '%s'.", #todasCidadesDaNacao, playerNationName))
+else
+    warn(string.format("Não foi possível encontrar a pasta de cidades para a nação: '%s'. A construção aleatória será pulada.", playerNationName or "N/A"))
+end
+
+-- Prosseguir apenas se encontrarmos cidades
+if #todasCidadesDaNacao > 0 then
+    math.randomseed(os.time())
+    print("[SCRIPT] Iniciando ciclo de construção aleatória...")
+
+    for _, nomeEdificio in ipairs(edificiosParaConstruir) do
+        local indiceAleatorio = math.random(1, #todasCidadesDaNacao)
+        local cidadeAleatoriaObj = todasCidadesDaNacao[indiceAleatorio]
+
+        if cidadeAleatoriaObj then
+            print(string.format("  -> Tentando construir '%s' na cidade aleatória: %s (%s)", nomeEdificio, cidadeAleatoriaObj.Name, playerNationName))
+            local args = {{cidadeAleatoriaObj}, nomeEdificio}
+            executarAcao(CreateBuildingRemote, args)
+            -- Se não quiser repetir cidades, descomente as 3 linhas abaixo:
+            -- table.remove(todasCidadesDaNacao, indiceAleatorio)
+            -- if #todasCidadesDaNacao == 0 then print("[SCRIPT] Todas as cidades foram usadas.") break end
+        else
+            warn("Erro ao obter cidade aleatória da lista.")
+        end
+    end
+    print("[SCRIPT] Construções aleatórias concluídas.")
+else
+    print("[SCRIPT] Nenhuma cidade encontrada para iniciar construções aleatórias.")
+end
+
+-- ===================================
+print("[SCRIPT] Sequência de ações concluída.")
+-- Fim do Script

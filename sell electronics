@@ -1,494 +1,115 @@
-wait(1)
-local args = {
-   [1] = "Japan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
+--[[
+    Script de Venda de Eletrônicos (v6 - Método Reverso: Não Vender para Players)
+
+    Objetivo: Vender "Electronics" (quantidade 5, preço 1) automaticamente para
+              todas as nações listadas, EXCETO aquelas que estão sendo controladas
+              por jogadores humanos no servidor.
+              Usa o atributo "Country" no Player para detectar nações controladas.
+
+    AVISO: Usar scripts para automação viola os Termos de Serviço do Roblox
+    e as regras de Rise of Nations. Risco de banimento. Use por sua conta e risco.
+]]
+
+-- Serviços e Atalhos Principais
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players") -- Serviço para listar jogadores
+
+local localPlayer = Players.LocalPlayer -- O próprio jogador
+
+local GameManager = Workspace:WaitForChild("GameManager")
+local ManageAllianceRemote = GameManager:WaitForChild("ManageAlliance") -- Remote para trocas
+
+-- Função Auxiliar para Executar Ações (Reutilizada)
+local function executarAcao(remoteEvent, arguments, delayTime)
+    if not remoteEvent then
+        warn("Tentativa de usar um RemoteEvent inválido.")
+        return
+    end
+    local success, err = pcall(function()
+        remoteEvent:FireServer(unpack(arguments))
+    end)
+    if not success then
+        warn(string.format("Erro ao executar ação para %s: %s", remoteEvent.Name, tostring(err)))
+    end
+    task.wait(delayTime or 1) -- Espera 1 segundo por padrão
+end
+
+-- ============================================
+-- CONFIGURAÇÕES DA VENDA DE ELETRÔNICOS
+-- ============================================
+local RESOURCE_TO_SELL = "Electronics"
+local QUANTITY_TO_SELL = 5
+local PRICE_PER_UNIT = 1
+local TRADE_ACTION = "Sell"
+local TRADE_TYPE = "Trade" -- 5º item na tabela interna de args
+
+-- ===================================
+-- DADOS DAS VENDAS TOTAIS (Potenciais) - LISTA ATUALIZADA
+-- ===================================
+-- Tabela contendo as nações para as quais vender Eletrônicos. Usa o NOME BASE.
+local vendasPotenciais = {
+    { nation = "Japan" }, { nation = "Mexico" }, { nation = "India" }, { nation = "China" },
+    { nation = "United States" }, { nation = "Bangladesh" }, { nation = "Argentina" }, { nation = "Pakistan" },
+    { nation = "Egypt" }, { nation = "Russia" }, { nation = "Philippines" }, { nation = "Turkey" },
+    { nation = "South Korea" }, { nation = "Nigeria" }, { nation = "Indonesia" }, { nation = "United Kingdom" },
+    { nation = "Peru" }, { nation = "Iran" }, { nation = "Colombia" },
+    { nation = "Democratic Republic of the Congo" }, -- Nome longo, verificar se está correto no jogo
+    { nation = "Hong Kong" }, { nation = "Taiwan" }, { nation = "Thailand" },
+    -- { nation = "Iran" }, -- Duplicado na lista original, removido aqui para evitar redundância, mas pode adicionar se quiser tentar 2x
+    { nation = "Canada" }, { nation = "Vietnam" }, { nation = "Singapore" }, { nation = "Chile" },
+    { nation = "Angola" }, { nation = "Iraq" }, { nation = "Burma" }, { nation = "Saudi Arabia" },
+    { nation = "Australia" }, { nation = "Sudan" }, { nation = "South Africa" }, { nation = "Cote d'Ivoire" },
+    { nation = "Germany" }, { nation = "Italy" },
+    -- Adicione mais nações aqui se necessário, apenas o nome base.
 }
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Mexico",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "India",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "China",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "United States",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Bangladesh",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Argentina",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Pakistan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Egypt",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Russia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Philippines",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Turkey",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "South Korea",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Nigeria",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Indonesia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "United Kingdom",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Peru",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Iran",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Colombia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Democratic Republic of the Congo",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Hong Kong",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Taiwan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Thailand",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Iran",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Canada",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Vietnam",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Singapore",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Chile",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Angola",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Iraq",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Burma",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Saudi Arabia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Australia",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Sudan",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "South Africa",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Cote d'Ivoire",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Germany",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
-wait(1)
-local args = {
-   [1] = "Italy",
-   [2] = "ResourceTrade",
-   [3] = {
-       [1] = "Electronics",
-       [2] = "Sell",
-       [3] = 5,
-       [4] = 1,
-       [5] = "Trade"
-   }
-}
-workspace.GameManager.ManageAlliance:FireServer(unpack(args))
+
+-- ========================================================
+-- LOOP PRINCIPAL DE VENDAS (COM VERIFICAÇÃO DE PLAYERS)
+-- ========================================================
+print(string.format("[SCRIPT] Iniciando ciclo de vendas de '%s', pulando nações controladas por players...", RESOURCE_TO_SELL))
+local vendasFeitas = 0
+local vendasPuladas = 0
+
+for i, vendaInfo in ipairs(vendasPotenciais) do
+    local targetNationName = vendaInfo.nation
+    local isPlayerControlled = false
+
+    -- Verifica se algum jogador no servidor controla esta nação
+    local currentPlayers = Players:GetPlayers()
+    for _, player in ipairs(currentPlayers) do
+        if player ~= localPlayer then
+            local playerNation = player:GetAttribute("Country") -- Usa o atributo "Country"
+            if playerNation and playerNation == targetNationName then
+                isPlayerControlled = true
+                vendasPuladas = vendasPuladas + 1
+                -- print(string.format("  -> Pulando %s (Controlado por: %s)", targetNationName, player.Name)) -- Log opcional
+                break
+            end
+        end
+    end
+
+    -- Se NENHUM jogador controla a nação, tenta vender
+    if not isPlayerControlled then
+        -- print(string.format("  -> %s não é controlada por jogador. Tentando vender %s...", targetNationName, RESOURCE_TO_SELL)) -- Log opcional
+
+        -- Monta os argumentos usando o NOME BASE da nação e as constantes definidas
+        local args = {
+            targetNationName,           -- Nome Base da Nação
+            "ResourceTrade",            -- Tipo de Ação
+            {                           -- Detalhes da Troca
+                RESOURCE_TO_SELL,       -- Recurso (Constante)
+                TRADE_ACTION,           -- Ação (Constante)
+                QUANTITY_TO_SELL,       -- Quantidade (Constante)
+                PRICE_PER_UNIT,         -- Preço (Constante)
+                TRADE_TYPE              -- Tipo/Confirmação (Constante)
+            }
+        }
+
+        -- Executa a ação
+        executarAcao(ManageAllianceRemote, args)
+        vendasFeitas = vendasFeitas + 1
+    end
+end
+
+print(string.format("[SCRIPT] Ciclo de vendas de '%s' concluído. Vendas tentadas: %d. Vendas puladas (players): %d.", RESOURCE_TO_SELL, vendasFeitas, vendasPuladas))
+-- Fim do Script

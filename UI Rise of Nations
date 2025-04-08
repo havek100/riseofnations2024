@@ -75,28 +75,10 @@ local Button = Tab:CreateButton({
    loadstring(game:HttpGet("https://raw.githubusercontent.com/havek99/riseofnationsscript/main/auto%20clear%20future%20notifications"))()
    end,
 })
-local Tab = Window:CreateTab("Auto Play", 4483362460) -- Title, Image
-Tab:Toggle{
-	Name = "Auto Play (ALL COUNTRIES)",
-	StartingState = false,
-	Description = nil,
-	Callback = function(state)
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/refs/heads/main/autoplay"))()
- end
-}
-Tab:Toggle{
-	Name = "France",
-	StartingState = false,
-	Description = nil,
-	Callback = function(state)
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/autoplay%20france"))()
- end
-}
-Tab:Toggle{
-	Name = "Turkey",
-	StartingState = false,
-	Description = nil,
-	Callback = function(state)
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/main/autoplay%20turkey"))()
- end
-}
+local Tab = Window:CreateTab("AutoPlay", 4483362460) -- Title, Image
+local Button = Tab:CreateButton({
+   Name = "AutoPlay",
+   Callback = function()
+   loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/refs/heads/main/autoplay"))()
+   end,
+})

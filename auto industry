@@ -1,58 +1,71 @@
 --[[
-    Script Combinado: Compras Específicas + Auto Industry v2
+    Script Combinado Final: Compras + Auto Industry Inteligente v4
 
-    Objetivo: Executar uma sequência de ações:
-    1. Comprar quantidades específicas de recursos de nações definidas (incluindo Ferro).
-    2. Construir um conjunto pré-definido de fábricas em cidades aleatórias
-       pertencentes à nação atual do jogador.
+    Objetivo: Executar uma sequência completa de ações:
+    1. Comprar recursos específicos de nações definidas.
+    2. Detectar fábricas existentes na nação do jogador.
+    3. Construir APENAS as fábricas que faltam para atingir as metas,
+       em cidades aleatórias.
 
-    Compras a Fazer (Atualizado):
-    - 4 Ferro de Algeria e Liberia (Novo!)
-    - 4 Cobre de Zambia
-    - 4 Ouro de Zimbabwe
-    - 4 Titânio de Australia e Senegal
-    - 3 Tungstênio de Vietnam e Bolivia
-    - 4 Fosfato de Iraq e Senegal
+    Metas de Fábricas: 2 Eletro, 1 Aço, 1 Motor, 1 Fert, 3 Civil.
 
-    Fábricas a Construir:
-    - 2x Electronics Factory, 1x Steel Manufactory, 1x Motor Factory,
-    - 1x Fertilizer Factory, 3x Civilian Factory
-
-    AVISO: Usar scripts para automação viola os Termos de Serviço do Roblox
-    e as regras de Rise of Nations. Risco de banimento.
+    AVISO: Riscos de banimento associados à automação. Use com cautela.
 ]]
 
-print("[Script Combinado v2] Iniciando...")
+print("[Combo Final v4] Iniciando...")
 
 --[[----------------------------------------------------------
-    CONFIGURAÇÕES
+    CONFIGURAÇÕES E SETUP ROBUSTO
 -------------------------------------------------------------]]
-local DELAY_ENTRE_ACOES = 1.5 -- Segundos de espera entre cada compra ou construção
+local DELAY_ENTRE_ACOES = 1.5 -- Delay entre compras e construções individuais
+local setupOk = true -- Flag para verificar se o setup foi bem-sucedido
 
---[[----------------------------------------------------------
-    SETUP INICIAL
--------------------------------------------------------------]]
--- Serviços
-local Workspace = game:GetService("Workspace")
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local localPlayer = Players.LocalPlayer
+-- Serviços (com pcall para segurança)
+local Workspace, Players, ReplicatedStorage, RunService
+local localPlayer, GameManager, WorldContainer, CitiesFolder
+local ManageAllianceRemote, CreateBuildingRemote -- Remotes para compra e construção
 
--- Objetos Principais (com verificação)
-local GameManager = Workspace:WaitForChild("GameManager", 20)
-local WorldContainer = Workspace:FindFirstChild("Baseplate") or Workspace:FindFirstChild("Map") or Workspace
-local CitiesFolder = WorldContainer and WorldContainer:FindFirstChild("Cities", 10)
+local function tryGetService(serviceName)
+    local success, service = pcall(game.GetService, game, serviceName)
+    if success and service then print(string.format("[Setup] GetService('%s') OK.", serviceName)) return service
+    else warn(string.format("[Setup] FALHA GetService('%s'): %s", serviceName, tostring(service))) setupOk = false return nil end
+end
 
--- RemoteEvents (Precisamos dos dois agora)
-local ManageAllianceRemote = GameManager and GameManager:WaitForChild("ManageAlliance", 15) -- Para Compras
-local CreateBuildingRemote = GameManager and GameManager:WaitForChild("CreateBuilding", 15) -- Para Construção
+Workspace = tryGetService("Workspace")
+Players = tryGetService("Players")
+ReplicatedStorage = tryGetService("ReplicatedStorage")
+RunService = tryGetService("RunService")
 
--- Verifica setup essencial
-if not (ManageAllianceRemote and CreateBuildingRemote and CitiesFolder and localPlayer) then
-    warn("[Script Combinado v2] ERRO CRÍTICO: Não foi possível encontrar objetos/remotes essenciais (GameManager, Remotes, CitiesFolder, LocalPlayer). O script não pode continuar.")
+if RunService and not RunService:IsClient() then warn("[Setup] ERRO: Script não está rodando no cliente.") setupOk = false end
+
+if Players then
+    local success, player = pcall(function() return Players.LocalPlayer end)
+    if success and player then localPlayer = player; print("[Setup] LocalPlayer OK:", localPlayer.Name) else warn("[Setup] Falha ao obter LocalPlayer:", tostring(player)) setupOk = false end
+else setupOk = false end
+
+if Workspace then
+    local successWC, container = pcall(function() return Workspace:FindFirstChild("Baseplate") or Workspace:FindFirstChild("Map") or Workspace end)
+    if successWC and container then WorldContainer = container; print(string.format("[Setup] WorldContainer encontrado: %s.", WorldContainer.Name))
+        local successCF, folder = pcall(function() return WorldContainer:FindFirstChild("Cities", 10) end)
+        if successCF and folder then CitiesFolder = folder; print("[Setup] Pasta 'Cities' encontrada.") elseif successCF then warn("[Setup] Pasta 'Cities' NÃO encontrada.") setupOk = false else warn("[Setup] Erro ao procurar 'Cities':", tostring(folder)) setupOk = false end
+    else warn("[Setup] Falha ao encontrar WorldContainer:", tostring(container)) setupOk = false end
+else setupOk = false end
+
+if Workspace then
+    local successGM, gm = pcall(Workspace.WaitForChild, Workspace, "GameManager", 20)
+    if successGM and gm then GameManager = gm; print("[Setup] GameManager OK.")
+        local successMAR, mar = pcall(GameManager.WaitForChild, GameManager, "ManageAlliance", 15)
+        if successMAR and mar then ManageAllianceRemote = mar; print("[Setup] ManageAllianceRemote OK.") else warn("[Setup] FALHA ao encontrar ManageAllianceRemote:", tostring(mar)) setupOk = false end
+        local successCBR, cbr = pcall(GameManager.WaitForChild, GameManager, "CreateBuilding", 15)
+        if successCBR and cbr then CreateBuildingRemote = cbr; print("[Setup] CreateBuildingRemote OK.") else warn("[Setup] FALHA ao encontrar CreateBuildingRemote:", tostring(cbr)) setupOk = false end
+    else warn("[Setup] FALHA ao encontrar GameManager:", tostring(gm)) setupOk = false end
+else setupOk = false end
+
+if not setupOk then
+    warn("[Combo Final v4] Setup inicial falhou devido aos erros acima. Script interrompido.")
     return
 end
-print("[Script Combinado v2] Setup inicial concluído.")
+print("[Combo Final v4] Setup inicial concluído com sucesso.")
 
 --[[----------------------------------------------------------
     FUNÇÃO AUXILIAR (Executa Ação Genérica)
@@ -66,115 +79,125 @@ local function executarAcao(remoteEvent, arguments, delayTime)
 end
 
 --[[----------------------------------------------------------
-    SEÇÃO 1: COMPRAS ESPECÍFICAS DE RECURSOS (COM FERRO)
+    SEÇÃO 1: COMPRAS ESPECÍFICAS DE RECURSOS
 -------------------------------------------------------------]]
-print("[Script Combinado v2] Iniciando compras específicas de recursos...")
-
+print("[Combo Final v4] Iniciando compras específicas...")
 local comprasEspecificas = {
-    -- Ferro (Novo! Quantidade 4 assumida)
-    { nation = "Algeria", resource = "Iron", quantity = 4, price = 1 },
-    { nation = "Liberia", resource = "Iron", quantity = 4, price = 1 },
-    -- Cobre
-    { nation = "Zambia", resource = "Copper", quantity = 4, price = 1 },
-    -- Ouro
-    { nation = "Zimbabwe", resource = "Gold", quantity = 4, price = 1 },
-    -- Titânio
-    { nation = "Australia", resource = "Titanium", quantity = 4, price = 1 },
-    { nation = "Senegal", resource = "Titanium", quantity = 4, price = 1 },
-    -- Tungstênio
-    { nation = "Vietnam", resource = "Tungsten", quantity = 3, price = 1 },
-    { nation = "Bolivia", resource = "Tungsten", quantity = 3, price = 1 },
-    -- Fosfato (Quantidade 4 assumida)
-    { nation = "Iraq", resource = "Phosphate", quantity = 4, price = 1 },
-    { nation = "Senegal", resource = "Phosphate", quantity = 4, price = 1 },
+    { nation = "Algeria", resource = "Iron", quantity = 4, price = 1 }, { nation = "Liberia", resource = "Iron", quantity = 4, price = 1 },
+    { nation = "Zambia", resource = "Copper", quantity = 4, price = 1 }, { nation = "Zimbabwe", resource = "Gold", quantity = 4, price = 1 },
+    { nation = "Australia", resource = "Titanium", quantity = 4, price = 1 }, { nation = "Senegal", resource = "Titanium", quantity = 4, price = 1 },
+    { nation = "Vietnam", resource = "Tungsten", quantity = 3, price = 1 }, { nation = "Bolivia", resource = "Tungsten", quantity = 3, price = 1 },
+    { nation = "Iraq", resource = "Phosphate", quantity = 4, price = 1 }, { nation = "Senegal", resource = "Phosphate", quantity = 4, price = 1 },
 }
-
 local comprasTentadas = 0
 for _, compraInfo in ipairs(comprasEspecificas) do
-    local args = {
-        compraInfo.nation,
-        "ResourceTrade",
-        {
-            compraInfo.resource,
-            "Buy", -- Ação é comprar
-            compraInfo.quantity,
-            compraInfo.price,
-            "Trade"
-        }
-    }
+    local args = {compraInfo.nation,"ResourceTrade",{compraInfo.resource,"Buy",compraInfo.quantity,compraInfo.price,"Trade"}}
     print(string.format("  -> Comprando %d %s de %s...", compraInfo.quantity, compraInfo.resource, compraInfo.nation))
-    if executarAcao(ManageAllianceRemote, args) then
-        comprasTentadas = comprasTentadas + 1
-    end
+    if executarAcao(ManageAllianceRemote, args) then comprasTentadas = comprasTentadas + 1 end
 end
-print(string.format("[Script Combinado v2] Compras específicas concluídas. %d comandos enviados.", comprasTentadas))
-
--- Pequena pausa antes de começar a construir
-task.wait(2)
+print(string.format("[Combo Final v4] Compras específicas concluídas. %d comandos enviados.", comprasTentadas))
+task.wait(2) -- Pausa antes da próxima seção
 
 --[[----------------------------------------------------------
-    SEÇÃO 2: CONSTRUÇÃO DE FÁBRICAS (Auto Industry)
+    SEÇÃO 2: DETECÇÃO E CÁLCULO DE FÁBRICAS NECESSÁRIAS
 -------------------------------------------------------------]]
-print("[Script Combinado v2] Iniciando construção de fábricas (Auto Industry)...")
-
--- Detecta a nação do jogador
-local playerNationName = localPlayer:GetAttribute("Country")
-local PlayerNationCitiesFolder = nil
-if playerNationName and CitiesFolder then
-    print(string.format("[Script Combinado v2] Nação detectada: '%s'. Procurando cidades...", playerNationName))
-    PlayerNationCitiesFolder = CitiesFolder:FindFirstChild(playerNationName, 5)
-else
-    if not playerNationName then warn("[Script Combinado v2] Não foi possível detectar a nação (Atributo 'Country').") end
-    if not CitiesFolder then warn("[Script Combinado v2] Pasta 'Cities' não encontrada.") end
-end
-
--- Obtém a lista de cidades
+print("[Combo Final v4] Iniciando detecção e cálculo de fábricas...")
+local metasFabricas = {
+    ["Electronics Factory"] = 2, ["Steel Manufactory"] = 1, ["Motor Factory"] = 1,
+    ["Fertilizer Factory"] = 1, ["Civilian Factory"] = 3,
+}
+local contagemAtualFabricas = {}
+local fabricasParaConstruirRealmente = {}
 local todasCidadesDaNacao = {}
-if PlayerNationCitiesFolder then
-    for _, child in ipairs(PlayerNationCitiesFolder:GetChildren()) do
-        table.insert(todasCidadesDaNacao, child)
+local playerNationName = nil
+local podeConstruir = false -- Flag para saber se a detecção foi bem sucedida
+
+local detectSuccess, detectResult = pcall(function()
+    -- Detecta nação
+    playerNationName = localPlayer:GetAttribute("Country")
+    if not playerNationName then error("Não foi possível detectar a nação (atributo 'Country' ausente ou nulo).") end
+
+    -- Encontra pasta de cidades
+    local PlayerNationCitiesFolder = CitiesFolder and CitiesFolder:FindFirstChild(playerNationName, 5) or nil
+    if not PlayerNationCitiesFolder then error(string.format("Pasta de cidades para '%s' não encontrada.", playerNationName)) end
+
+    -- Lista cidades
+    for _, child in ipairs(PlayerNationCitiesFolder:GetChildren()) do table.insert(todasCidadesDaNacao, child) end
+    if #todasCidadesDaNacao == 0 then error("Nenhuma cidade encontrada na pasta da nação.") end
+    print(string.format("[Combo Final v4] Nação: '%s'. Cidades: %d. Verificando fábricas existentes...", playerNationName, #todasCidadesDaNacao))
+
+    -- Conta fábricas existentes (com pcall interno por cidade)
+    for _, cidadeObj in ipairs(todasCidadesDaNacao) do
+        local scanCitySuccess, scanCityErr = pcall(function()
+             -- !! SUPOSIÇÃO: Edifícios em "Buildings" ou filhos diretos !!
+             local buildingsContainer = cidadeObj:FindFirstChild("Buildings") or cidadeObj
+             if buildingsContainer then
+                 for _, edificioObj in ipairs(buildingsContainer:GetChildren()) do
+                     local nomeEdificio = edificioObj.Name
+                     if metasFabricas[nomeEdificio] then
+                         contagemAtualFabricas[nomeEdificio] = (contagemAtualFabricas[nomeEdificio] or 0) + 1
+                     end
+                 end
+             end
+        end)
+        if not scanCitySuccess then warn(string.format("Erro ao escanear cidade %s: %s", cidadeObj.Name, scanCityErr)) end
     end
-    print(string.format("[Script Combinado v2] Encontradas %d cidades para a nação '%s'.", #todasCidadesDaNacao, playerNationName))
-else
-    warn(string.format("[Script Combinado v2] Pasta de cidades para '%s' não encontrada. Construção será pulada.", playerNationName or "N/A"))
+    print("[Combo Final v4] Contagem atual de fábricas:")
+    for tipo, meta in pairs(metasFabricas) do print(string.format("  -> %s: %d / %d", tipo, contagemAtualFabricas[tipo] or 0, meta)) end
+
+    -- Calcula necessárias
+    print("[Combo Final v4] Calculando fábricas necessárias...")
+    for tipoFabrica, metaContagem in pairs(metasFabricas) do
+        local contagemAtual = contagemAtualFabricas[tipoFabrica] or 0
+        local necessarioConstruir = metaContagem - contagemAtual
+        if necessarioConstruir > 0 then
+            print(string.format("  -> Necessário construir %d de '%s'", necessarioConstruir, tipoFabrica))
+            for i = 1, necessarioConstruir do table.insert(fabricasParaConstruirRealmente, tipoFabrica) end
+        end
+    end
+    podeConstruir = true -- Se chegou até aqui sem erro, a detecção/cálculo foi OK
+end)
+
+if not detectSuccess then
+    warn("[Combo Final v4] Erro durante detecção/cálculo de fábricas:", detectResult)
+    warn("[Combo Final v4] Seção de construção será pulada.")
 end
 
--- Prossegue apenas se houver cidades encontradas
-if #todasCidadesDaNacao > 0 then
-    -- Define a lista de fábricas a serem construídas
-    local fabricasParaConstruir = {
-        "Electronics Factory", "Electronics Factory",
-        "Steel Manufactory",
-        "Motor Factory",
-        "Fertilizer Factory",
-        "Civilian Factory", "Civilian Factory", "Civilian Factory",
-    }
-
-    print(string.format("[Script Combinado v2] Iniciando construção de %d fábricas em cidades aleatórias...", #fabricasParaConstruir))
-    math.randomseed(os.time()) -- Inicializa o gerador aleatório
-
+--[[----------------------------------------------------------
+    SEÇÃO 3: CONSTRUÇÃO DAS FÁBRICAS NECESSÁRIAS
+-------------------------------------------------------------]]
+-- Só executa se a detecção foi bem sucedida, se há fábricas a construir e se há cidades disponíveis
+if podeConstruir and #fabricasParaConstruirRealmente > 0 and #todasCidadesDaNacao > 0 then
+    print(string.format("[Combo Final v4] Iniciando construção de %d fábricas necessárias...", #fabricasParaConstruirRealmente))
+    math.randomseed(os.time())
     local construcoesFeitas = 0
-    for _, nomeFabrica in ipairs(fabricasParaConstruir) do
+
+    for _, nomeFabrica in ipairs(fabricasParaConstruirRealmente) do
+        -- Escolhe cidade aleatória
         local indiceAleatorio = math.random(1, #todasCidadesDaNacao)
         local cidadeAleatoriaObj = todasCidadesDaNacao[indiceAleatorio]
 
         if cidadeAleatoriaObj then
-            print(string.format("  -> Construindo '%s' na cidade aleatória: %s", nomeFabrica, cidadeAleatoriaObj.Name))
-            local args = {{cidadeAleatoriaObj}, nomeFabrica}
-            if executarAcao(CreateBuildingRemote, args) then -- Usa a mesma função auxiliar
-                construcoesFeitas = construcoesFeitas + 1
-            end
-            -- Opcional: remover cidade da lista para não repetir
-            -- table.remove(todasCidadesDaNacao, indiceAleatorio)
-            -- if #todasCidadesDaNacao == 0 and construcoesFeitas < #fabricasParaConstruir then warn("Acabaram as cidades!") break end
+             print(string.format("  -> Construindo '%s' na cidade aleatória: %s", nomeFabrica, cidadeAleatoriaObj.Name))
+             local args = {{cidadeAleatoriaObj}, nomeFabrica}
+             if executarAcao(CreateBuildingRemote, args) then
+                 construcoesFeitas = construcoesFeitas + 1
+             end
+             -- Opcional: remover cidade?
         else
-            warn("[Script Combinado v2] Erro: falha ao selecionar objeto de cidade aleatória.")
+             warn("[Combo Final v4] Erro ao selecionar cidade aleatória.")
         end
     end
-    print(string.format("[Script Combinado v2] Construção de fábricas concluída. %d comandos enviados.", construcoesFeitas))
-else
-    print("[Script Combinado v2] Nenhuma cidade encontrada, construção não realizada.")
-end
+    print(string.format("[Combo Final v4] Construção concluída. %d comandos enviados.", construcoesFeitas))
 
-print("[Script Combinado v2] Todas as ações foram concluídas.")
+elseif podeConstruir then -- Se a detecção funcionou mas não precisa construir ou não tem cidades
+     if #fabricasParaConstruirRealmente == 0 then
+         print("[Combo Final v4] Nenhuma fábrica nova necessária. Metas atingidas.")
+     else -- #todasCidadesDaNacao deve ser 0 (ou erro no pcall anterior)
+         print("[Combo Final v4] Nenhuma cidade encontrada para construir as fábricas necessárias.")
+     end
+end
+-- Se podeConstruir for false, o aviso de erro já foi dado na seção anterior.
+
+print("[Combo Final v4] Script finalizado.")
 -- Fim do Script

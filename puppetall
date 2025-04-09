@@ -1,0 +1,100 @@
+--[[
+    Script para Enviar "PuppetRequest" a Todos os Outros Jogadores
+
+    Objetivo: Enviar uma solicitação de "PuppetRequest" para a NAÇÃO
+              controlada por cada um dos OUTROS jogadores humanos no servidor.
+              Usa o atributo "Country" no Player para identificar a nação alvo.
+
+    AVISO IMPORTANTE:
+    1. RISCO DE BAN: Usar scripts para automação/envio de requests viola os Termos de Serviço.
+    2. IRRITAÇÃO/CONFLITO: Enviar solicitações não desejadas (especialmente de puppet)
+       para todos os jogadores pode ser visto como spam, assédio ou ato hostil,
+       podendo levar a retaliação no jogo ou denúncias. USE COM EXTREMA CAUTELA E RESPONSABILIDADE.
+    3. FUNCIONALIDADE: A funcionalidade depende se o RemoteEvent 'ManageAlliance'
+       aceita o nome da nação do jogador como alvo para um 'SendRequest' do tipo 'PuppetRequest'.
+       Isso é uma suposição baseada no snippet original e na lógica do jogo. Pode não funcionar
+       se o jogo esperar um ID de jogador ou outro formato.
+]]
+
+-- Serviços e Atalhos Principais
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+
+local localPlayer = Players.LocalPlayer -- O próprio jogador (para não enviar para si mesmo)
+
+local GameManager = Workspace:WaitForChild("GameManager")
+local ManageAllianceRemote = GameManager:WaitForChild("ManageAlliance") -- Remote usado no snippet
+
+-- Função Auxiliar para Executar Ações (Reutilizada)
+local function executarAcao(remoteEvent, arguments, delayTime)
+    if not remoteEvent then
+        warn("Tentativa de usar um RemoteEvent inválido.")
+        return false -- Retorna falha para indicar que não foi enviado
+    end
+    local success, err = pcall(function()
+        remoteEvent:FireServer(unpack(arguments))
+    end)
+    if not success then
+        warn(string.format("Erro ao executar ação para %s: %s", remoteEvent.Name, tostring(err)))
+    end
+    -- Adiciona um pequeno delay aleatório ao tempo base para variar um pouco
+    local finalDelay = (delayTime or 1) + (math.random() * 0.5 - 0.25)
+    task.wait(finalDelay)
+    return success -- Retorna se o pcall teve sucesso (não garante que o servidor aceitou)
+end
+
+-- ============================================
+-- CONFIGURAÇÕES DA SOLICITAÇÃO
+-- ============================================
+local ACTION_TYPE = "SendRequest"
+local REQUEST_DETAILS = {"PuppetRequest"}
+local DELAY_BETWEEN_REQUESTS = 2 -- Segundos base entre cada envio (para não ser spam instantâneo)
+
+-- ========================================================
+-- LOOP PARA ENVIAR SOLICITAÇÃO AOS OUTROS PLAYERS
+-- ========================================================
+print("[SCRIPT] Iniciando envio de 'PuppetRequest' para nações de outros jogadores...")
+local requestsSentSuccess = 0
+local playersChecked = 0
+local playersSkipped = 0 -- Jogadores sem nação detectada ou o próprio jogador
+
+local allPlayers = Players:GetPlayers() -- Pega a lista atual de jogadores no servidor
+
+for _, player in ipairs(allPlayers) do
+    playersChecked = playersChecked + 1
+    -- Pula o próprio jogador
+    if player == localPlayer then
+        playersSkipped = playersSkipped + 1
+        continue -- Vai para o próximo jogador
+    end
+
+    -- Pega a nação controlada pelo jogador alvo usando o atributo "Country"
+    local targetNationName = player:GetAttribute("Country")
+
+    if targetNationName then
+        print(string.format("  -> Preparando 'PuppetRequest' para %s (Nação de %s)...", targetNationName, player.Name))
+
+        -- Monta os argumentos usando o NOME DA NAÇÃO do jogador alvo
+        -- Assumindo que o RemoteEvent espera o nome da nação como args[1]
+        local args = {
+            targetNationName, -- Alvo é a nação do jogador
+            ACTION_TYPE,
+            REQUEST_DETAILS
+        }
+
+        -- Executa a ação (envia a solicitação)
+        if executarAcao(ManageAllianceRemote, args, DELAY_BETWEEN_REQUESTS) then
+            requestsSentSuccess = requestsSentSuccess + 1
+            print(string.format("      Solicitação enviada para %s.", targetNationName)) -- Confirmação opcional
+        else
+             print(string.format("      Falha ao enviar para %s (pcall falhou).", targetNationName)) -- Confirmação opcional
+        end
+    else
+        -- Não foi possível encontrar a nação para este jogador
+        warn(string.format("  -> Não foi possível determinar a nação para o jogador %s. Pulando.", player.Name))
+        playersSkipped = playersSkipped + 1
+    end
+end
+
+print(string.format("[SCRIPT] Envio de 'PuppetRequest' concluído. Jogadores verificados: %d. Solicitações enviadas com sucesso (pcall): %d. Jogadores pulados (sem nação ou você mesmo): %d.", playersChecked, requestsSentSuccess, playersSkipped))
+-- Fim do Script

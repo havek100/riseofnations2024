@@ -75,6 +75,12 @@ local Button = Tab:CreateButton({
    loadstring(game:HttpGet("https://raw.githubusercontent.com/havek99/riseofnationsscript/main/auto%20clear%20future%20notifications"))()
    end,
 })
+local Button = Tab:CreateButton({
+   Name = "Puppet All",
+   Callback = function()
+   loadstring(game:HttpGet("https://raw.githubusercontent.com/havek100/riseofnations2024/refs/heads/main/puppetall"))()
+   end,
+})
 local Tab = Window:CreateTab("AutoPlay", 4483362460) -- Title, Image
 local Button = Tab:CreateButton({
    Name = "AutoPlay",

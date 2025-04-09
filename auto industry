@@ -1,0 +1,180 @@
+--[[
+    Script Combinado: Compras Específicas + Auto Industry v2
+
+    Objetivo: Executar uma sequência de ações:
+    1. Comprar quantidades específicas de recursos de nações definidas (incluindo Ferro).
+    2. Construir um conjunto pré-definido de fábricas em cidades aleatórias
+       pertencentes à nação atual do jogador.
+
+    Compras a Fazer (Atualizado):
+    - 4 Ferro de Algeria e Liberia (Novo!)
+    - 4 Cobre de Zambia
+    - 4 Ouro de Zimbabwe
+    - 4 Titânio de Australia e Senegal
+    - 3 Tungstênio de Vietnam e Bolivia
+    - 4 Fosfato de Iraq e Senegal
+
+    Fábricas a Construir:
+    - 2x Electronics Factory, 1x Steel Manufactory, 1x Motor Factory,
+    - 1x Fertilizer Factory, 3x Civilian Factory
+
+    AVISO: Usar scripts para automação viola os Termos de Serviço do Roblox
+    e as regras de Rise of Nations. Risco de banimento.
+]]
+
+print("[Script Combinado v2] Iniciando...")
+
+--[[----------------------------------------------------------
+    CONFIGURAÇÕES
+-------------------------------------------------------------]]
+local DELAY_ENTRE_ACOES = 1.5 -- Segundos de espera entre cada compra ou construção
+
+--[[----------------------------------------------------------
+    SETUP INICIAL
+-------------------------------------------------------------]]
+-- Serviços
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local localPlayer = Players.LocalPlayer
+
+-- Objetos Principais (com verificação)
+local GameManager = Workspace:WaitForChild("GameManager", 20)
+local WorldContainer = Workspace:FindFirstChild("Baseplate") or Workspace:FindFirstChild("Map") or Workspace
+local CitiesFolder = WorldContainer and WorldContainer:FindFirstChild("Cities", 10)
+
+-- RemoteEvents (Precisamos dos dois agora)
+local ManageAllianceRemote = GameManager and GameManager:WaitForChild("ManageAlliance", 15) -- Para Compras
+local CreateBuildingRemote = GameManager and GameManager:WaitForChild("CreateBuilding", 15) -- Para Construção
+
+-- Verifica setup essencial
+if not (ManageAllianceRemote and CreateBuildingRemote and CitiesFolder and localPlayer) then
+    warn("[Script Combinado v2] ERRO CRÍTICO: Não foi possível encontrar objetos/remotes essenciais (GameManager, Remotes, CitiesFolder, LocalPlayer). O script não pode continuar.")
+    return
+end
+print("[Script Combinado v2] Setup inicial concluído.")
+
+--[[----------------------------------------------------------
+    FUNÇÃO AUXILIAR (Executa Ação Genérica)
+-------------------------------------------------------------]]
+local function executarAcao(remoteEvent, arguments, delayTime)
+    if not remoteEvent then warn("RemoteEvent inválido na ação.") return false end
+    local success, err = pcall(function() remoteEvent:FireServer(unpack(arguments)) end)
+    if not success then warn(string.format("Erro na ação %s: %s", remoteEvent.Name, tostring(err))) end
+    task.wait(delayTime or DELAY_ENTRE_ACOES)
+    return success
+end
+
+--[[----------------------------------------------------------
+    SEÇÃO 1: COMPRAS ESPECÍFICAS DE RECURSOS (COM FERRO)
+-------------------------------------------------------------]]
+print("[Script Combinado v2] Iniciando compras específicas de recursos...")
+
+local comprasEspecificas = {
+    -- Ferro (Novo! Quantidade 4 assumida)
+    { nation = "Algeria", resource = "Iron", quantity = 4, price = 1 },
+    { nation = "Liberia", resource = "Iron", quantity = 4, price = 1 },
+    -- Cobre
+    { nation = "Zambia", resource = "Copper", quantity = 4, price = 1 },
+    -- Ouro
+    { nation = "Zimbabwe", resource = "Gold", quantity = 4, price = 1 },
+    -- Titânio
+    { nation = "Australia", resource = "Titanium", quantity = 4, price = 1 },
+    { nation = "Senegal", resource = "Titanium", quantity = 4, price = 1 },
+    -- Tungstênio
+    { nation = "Vietnam", resource = "Tungsten", quantity = 3, price = 1 },
+    { nation = "Bolivia", resource = "Tungsten", quantity = 3, price = 1 },
+    -- Fosfato (Quantidade 4 assumida)
+    { nation = "Iraq", resource = "Phosphate", quantity = 4, price = 1 },
+    { nation = "Senegal", resource = "Phosphate", quantity = 4, price = 1 },
+}
+
+local comprasTentadas = 0
+for _, compraInfo in ipairs(comprasEspecificas) do
+    local args = {
+        compraInfo.nation,
+        "ResourceTrade",
+        {
+            compraInfo.resource,
+            "Buy", -- Ação é comprar
+            compraInfo.quantity,
+            compraInfo.price,
+            "Trade"
+        }
+    }
+    print(string.format("  -> Comprando %d %s de %s...", compraInfo.quantity, compraInfo.resource, compraInfo.nation))
+    if executarAcao(ManageAllianceRemote, args) then
+        comprasTentadas = comprasTentadas + 1
+    end
+end
+print(string.format("[Script Combinado v2] Compras específicas concluídas. %d comandos enviados.", comprasTentadas))
+
+-- Pequena pausa antes de começar a construir
+task.wait(2)
+
+--[[----------------------------------------------------------
+    SEÇÃO 2: CONSTRUÇÃO DE FÁBRICAS (Auto Industry)
+-------------------------------------------------------------]]
+print("[Script Combinado v2] Iniciando construção de fábricas (Auto Industry)...")
+
+-- Detecta a nação do jogador
+local playerNationName = localPlayer:GetAttribute("Country")
+local PlayerNationCitiesFolder = nil
+if playerNationName and CitiesFolder then
+    print(string.format("[Script Combinado v2] Nação detectada: '%s'. Procurando cidades...", playerNationName))
+    PlayerNationCitiesFolder = CitiesFolder:FindFirstChild(playerNationName, 5)
+else
+    if not playerNationName then warn("[Script Combinado v2] Não foi possível detectar a nação (Atributo 'Country').") end
+    if not CitiesFolder then warn("[Script Combinado v2] Pasta 'Cities' não encontrada.") end
+end
+
+-- Obtém a lista de cidades
+local todasCidadesDaNacao = {}
+if PlayerNationCitiesFolder then
+    for _, child in ipairs(PlayerNationCitiesFolder:GetChildren()) do
+        table.insert(todasCidadesDaNacao, child)
+    end
+    print(string.format("[Script Combinado v2] Encontradas %d cidades para a nação '%s'.", #todasCidadesDaNacao, playerNationName))
+else
+    warn(string.format("[Script Combinado v2] Pasta de cidades para '%s' não encontrada. Construção será pulada.", playerNationName or "N/A"))
+end
+
+-- Prossegue apenas se houver cidades encontradas
+if #todasCidadesDaNacao > 0 then
+    -- Define a lista de fábricas a serem construídas
+    local fabricasParaConstruir = {
+        "Electronics Factory", "Electronics Factory",
+        "Steel Manufactory",
+        "Motor Factory",
+        "Fertilizer Factory",
+        "Civilian Factory", "Civilian Factory", "Civilian Factory",
+    }
+
+    print(string.format("[Script Combinado v2] Iniciando construção de %d fábricas em cidades aleatórias...", #fabricasParaConstruir))
+    math.randomseed(os.time()) -- Inicializa o gerador aleatório
+
+    local construcoesFeitas = 0
+    for _, nomeFabrica in ipairs(fabricasParaConstruir) do
+        local indiceAleatorio = math.random(1, #todasCidadesDaNacao)
+        local cidadeAleatoriaObj = todasCidadesDaNacao[indiceAleatorio]
+
+        if cidadeAleatoriaObj then
+            print(string.format("  -> Construindo '%s' na cidade aleatória: %s", nomeFabrica, cidadeAleatoriaObj.Name))
+            local args = {{cidadeAleatoriaObj}, nomeFabrica}
+            if executarAcao(CreateBuildingRemote, args) then -- Usa a mesma função auxiliar
+                construcoesFeitas = construcoesFeitas + 1
+            end
+            -- Opcional: remover cidade da lista para não repetir
+            -- table.remove(todasCidadesDaNacao, indiceAleatorio)
+            -- if #todasCidadesDaNacao == 0 and construcoesFeitas < #fabricasParaConstruir then warn("Acabaram as cidades!") break end
+        else
+            warn("[Script Combinado v2] Erro: falha ao selecionar objeto de cidade aleatória.")
+        end
+    end
+    print(string.format("[Script Combinado v2] Construção de fábricas concluída. %d comandos enviados.", construcoesFeitas))
+else
+    print("[Script Combinado v2] Nenhuma cidade encontrada, construção não realizada.")
+end
+
+print("[Script Combinado v2] Todas as ações foram concluídas.")
+-- Fim do Script

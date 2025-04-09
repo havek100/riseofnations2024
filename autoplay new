@@ -1,0 +1,215 @@
+--[[
+    Autoplay Script Core Logic for Rise of Nations (v7 - Simple Loop)
+
+    Objetivo: Executar continuamente as ações do script v4 (compra, pesquisa, build)
+              enquanto a variável global _G.autoplayLigado for true.
+              Destinado a ser carregado via loadstring() e controlado externamente.
+
+    COMO USAR:
+    1. Carregue este script via loadstring() UMA VEZ por sessão de jogo.
+    2. Para INICIAR/CONTINUAR o loop: defina _G.autoplayLigado = true (ex: no callback 'true' do seu toggle).
+    3. Para PARAR o loop: defina _G.autoplayLigado = false (ex: no callback 'false' do seu toggle).
+    4. O loop rodará em segundo plano enquanto _G.autoplayLigado for true.
+
+    AVISO: Riscos de banimento associados ao uso de scripts/automação. Uso contínuo aumenta o risco.
+]]
+
+-- Evita redefinições se carregado múltiplas vezes
+if _G.AutoplayRoNSimpleLoopLoaded then
+    print("[AUTOPLAY v7] Script já foi carregado anteriormente nesta sessão. Use _G.autoplayLigado para controlar.")
+    return
+end
+
+print("[AUTOPLAY v7] Configurando setup inicial (executa uma vez por carregamento)...")
+
+--[[----------------------------------------------------------
+    CONFIGURAÇÕES
+-------------------------------------------------------------]]
+local TEMPO_ESPERA_ENTRE_CICLOS_COMPLETOS = 30 -- Segundos para esperar após TODAS as ações serem feitas
+local DELAY_PADRAO_ENTRE_ACOES_INDIVIDUAIS = 0.7 -- Delay entre cada compra, pesquisa ou construção individual
+
+--[[----------------------------------------------------------
+    SETUP INICIAL (Executa uma vez ao carregar)
+-------------------------------------------------------------]]
+-- Serviços
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService") -- Usado para verificar se é cliente
+local localPlayer = Players.LocalPlayer
+
+-- Verifica se está rodando no cliente
+if not RunService:IsClient() then
+     warn("[AUTOPLAY v7] Este script deve ser executado em um ambiente cliente (exploit).")
+     return
+end
+
+-- Objetos Principais (com verificação)
+local GameManager = Workspace:WaitForChild("GameManager", 20)
+local Baseplate = Workspace:WaitForChild("Baseplate", 20)
+local Assets = ReplicatedStorage:WaitForChild("Assets", 20)
+local TechnologyFolder = Assets and Assets:WaitForChild("Technology", 20)
+local CitiesFolder = Baseplate and Baseplate:FindFirstChild("Cities", 10)
+
+-- Referências aos RemoteEvents
+local ManageAllianceRemote = GameManager and GameManager:WaitForChild("ManageAlliance", 15)
+local ChangeLawRemote = GameManager and GameManager:WaitForChild("ChangeLaw", 15)
+local CreateBuildingRemote = GameManager and GameManager:WaitForChild("CreateBuilding", 15)
+
+-- Verifica setup
+if not (ManageAllianceRemote and ChangeLawRemote and CreateBuildingRemote and TechnologyFolder and CitiesFolder and localPlayer) then
+    warn("[AUTOPLAY v7] ERRO CRÍTICO no setup inicial: Não foi possível encontrar objetos/remotes essenciais. O script não pode continuar.")
+    _G.AutoplayRoNSimpleLoopLoaded = false -- Marca falha no setup
+    return
+end
+print("[AUTOPLAY v7] Setup inicial concluído com sucesso.")
+
+--[[----------------------------------------------------------
+    VARIÁVEL GLOBAL DE CONTROLE
+-------------------------------------------------------------]]
+-- Inicializa como false se não existir, senão mantém o valor atual (útil se recarregar o script)
+_G.autoplayLigado = _G.autoplayLigado or false
+print(string.format("[AUTOPLAY v7] Estado inicial de _G.autoplayLigado: %s", tostring(_G.autoplayLigado)))
+
+--[[----------------------------------------------------------
+    FUNÇÃO AUXILIAR (Executa Ação com Checagem)
+-------------------------------------------------------------]]
+local function executarAcaoComCheck(remoteEvent, arguments, delayTime)
+    -- Checa ANTES de tentar enviar
+    if not _G.autoplayLigado then return false end -- Se foi desligado, retorna false para sinalizar interrupção
+    if not remoteEvent then warn("RemoteEvent inválido na ação.") return true end -- Retorna true para não parar o ciclo por erro interno recuperável
+
+    local success, err = pcall(function() remoteEvent:FireServer(unpack(arguments)) end)
+    if not success then warn(string.format("Erro na ação %s: %s", remoteEvent.Name, tostring(err))) end
+
+    -- Espera, mas verifica _G.autoplayLigado periodicamente para parada rápida
+    local waitEnd = os.clock() + (delayTime or DELAY_PADRAO_ENTRE_ACOES_INDIVIDUAIS)
+    while os.clock() < waitEnd do
+        if not _G.autoplayLigado then return false end -- Se desligado durante a espera, retorna false
+        task.wait(0.1) -- Pequena pausa na verificação
+    end
+
+    return true -- Retorna true indicando que continuou ligado durante a ação/espera
+end
+
+--[[----------------------------------------------------------
+    LOOP PRINCIPAL CONTÍNUO (em nova thread)
+-------------------------------------------------------------]]
+print("[AUTOPLAY v7] Iniciando thread do loop principal. Controle com _G.autoplayLigado.")
+
+spawn(function() -- Roda o loop em uma nova thread para não travar
+    while true do -- O loop principal roda para sempre...
+        if _G.autoplayLigado then -- ...mas só executa as ações se a variável global estiver true
+
+            print("===================================")
+            print("[AUTOPLAY v7] Iniciando novo ciclo de ações...")
+            local cicloStartTime = os.clock()
+            local continuarCiclo = true -- Flag para interrupção dentro do ciclo
+
+            -- Executa todo o ciclo dentro de um pcall para segurança
+            local cyclePcallSuccess, cyclePcallResult = pcall(function()
+
+                -- === DETECÇÃO DA NAÇÃO E CIDADES ===
+                local playerNationName = localPlayer:GetAttribute("Country")
+                local PlayerNationCitiesFolder = playerNationName and CitiesFolder and CitiesFolder:FindFirstChild(playerNationName, 5) or nil
+                local todasCidadesDaNacao = {}
+                if PlayerNationCitiesFolder then
+                    for _, child in ipairs(PlayerNationCitiesFolder:GetChildren()) do table.insert(todasCidadesDaNacao, child) end
+                end
+                if playerNationName then print("[AUTOPLAY v7] Nação:", playerNationName, "| Cidades:", #todasCidadesDaNacao) else print("[AUTOPLAY v7] Aviso: Nação não detectada.") end
+
+                -- === 1. COMPRAR RECURSOS ===
+                if not _G.autoplayLigado then continuarCiclo = false return end -- Verifica antes
+                print("[AUTOPLAY v7] Comprando recursos...")
+                local trocasParaExecutar = {
+                    {nation = "Chile", resource = "Copper", quantity = 3, price = 1}, {nation = "Kazakhstan", resource = "Copper", quantity = 3, price = 1},
+                    {nation = "Zimbabwe", resource = "Gold", quantity = 3, price = 1}, {nation = "Canada", resource = "Gold", quantity = 3, price = 1}, {nation = "Ghana", resource = "Gold", quantity = 3, price = 1},
+                    {nation = "Australia", resource = "Titanium", quantity = 3, price = 1}, {nation = "Norway", resource = "Titanium", quantity = 3, price = 1},
+                    {nation = "Bolivia", resource = "Tungsten", quantity = 2, price = 1}, {nation = "Vietnam", resource = "Tungsten", quantity = 3, price = 1},
+                    {nation = "Tunisia", resource = "Phosphate", quantity = 3, price = 1}, {nation = "Algeria", resource = "Phosphate", quantity = 3, price = 1},
+                }
+                for _, tradeInfo in ipairs(trocasParaExecutar) do
+                    local args = {tradeInfo.nation, "ResourceTrade", {tradeInfo.resource, "Buy", tradeInfo.quantity, tradeInfo.price, "Trade"}}
+                    if not executarAcaoComCheck(ManageAllianceRemote, args) then continuarCiclo = false; return end -- Para o ciclo se desligado
+                end
+                if continuarCiclo then print("[AUTOPLAY v7] Compras concluídas.") end
+
+                -- === 2. PESQUISAR TECNOLOGIAS ===
+                if not continuarCiclo or not _G.autoplayLigado then return end -- Verifica antes
+                print("[AUTOPLAY v7] Pesquisando tecnologias...")
+                local nomesTecnologias = {"Economic Improvements", "Factory Output 1", "Factory Output 2"}
+                for _, nomeTech in ipairs(nomesTecnologias) do
+                    local techObj = TechnologyFolder and TechnologyFolder:FindFirstChild(nomeTech)
+                    if techObj then
+                        local args = {"Research", techObj}
+                        if not executarAcaoComCheck(ChangeLawRemote, args) then continuarCiclo = false; return end -- Para o ciclo se desligado
+                    end
+                end
+                 if continuarCiclo then print("[AUTOPLAY v7] Pesquisas concluídas.") end
+
+                -- === 3. CONSTRUIR EDIFÍCIOS ===
+                if not continuarCiclo or not _G.autoplayLigado then return end -- Verifica antes
+                if #todasCidadesDaNacao > 0 then
+                    print("[AUTOPLAY v7] Construindo edifícios...")
+                    local edificiosParaConstruir = {
+                        "Electronics Factory", "Motor Factory", "Steel Manufactory", "Fertilizer Factory",
+                        "Civilian Factory", "Civilian Factory", "Civilian Factory"
+                    }
+                    math.randomseed(os.clock())
+                    for _, nomeEdificio in ipairs(edificiosParaConstruir) do
+                         local indiceAleatorio = math.random(1, #todasCidadesDaNacao)
+                         local cidadeAleatoriaObj = todasCidadesDaNacao[indiceAleatorio]
+                         if cidadeAleatoriaObj then
+                             local args = {{cidadeAleatoriaObj}, nomeEdificio}
+                             if not executarAcaoComCheck(CreateBuildingRemote, args) then continuarCiclo = false; return end -- Para o ciclo se desligado
+                         end
+                    end
+                     if continuarCiclo then print("[AUTOPLAY v7] Construções concluídas.") end
+                else
+                    print("[AUTOPLAY v7] Nenhuma cidade encontrada para construir.")
+                end
+
+            end) -- Fim do pcall que envolve o ciclo
+
+            -- Tratamento após o ciclo (ou tentativa de ciclo)
+            if not cyclePcallSuccess then
+                warn("[AUTOPLAY v7] Erro durante execução do ciclo:", cyclePcallResult)
+                -- Em caso de erro, espera um tempo maior antes de tentar de novo (se ainda estiver ligado)
+                 if _G.autoplayLigado then
+                     print("[AUTOPLAY v7] Erro no ciclo, aguardando mais antes de tentar novamente...")
+                     local waitEndError = os.clock() + TEMPO_ESPERA_ENTRE_CICLOS_COMPLETOS * 2 -- Dobro do tempo normal
+                     while os.clock() < waitEndError do
+                         if not _G.autoplayLigado then break end
+                         task.wait(1)
+                     end
+                 end
+            else
+                -- Se o ciclo terminou (ou foi interrompido por desligar)
+                if continuarCiclo then -- Se não foi interrompido por desligar no meio
+                    print(string.format("[AUTOPLAY v7] Ciclo concluído em %.2f segundos.", os.clock() - cicloStartTime))
+                    print("===================================")
+                    -- Espera longa entre ciclos, mas só se ainda estiver ligado
+                    if _G.autoplayLigado then
+                        print(string.format("[AUTOPLAY v7] Aguardando %d segundos para o próximo ciclo...", TEMPO_ESPERA_ENTRE_CICLOS_COMPLETOS))
+                        local waitEndLoop = os.clock() + TEMPO_ESPERA_ENTRE_CICLOS_COMPLETOS
+                        while os.clock() < waitEndLoop do
+                            if not _G.autoplayLigado then break end
+                            task.wait(1) -- Verifica a cada segundo se foi desligado
+                        end
+                    end
+                else
+                    -- Se foi interrompido por desligar no meio, não espera o tempo longo
+                    print("[AUTOPLAY v7] Ciclo interrompido por comando externo.")
+                    task.wait(1) -- Pequena pausa antes de checar o while de novo
+                end
+            end
+        else
+            -- Se _G.autoplayLigado for false, apenas espera um pouco antes de verificar de novo
+            task.wait(2) -- Espera 2 segundos se estiver desligado
+        end
+    end -- Fim do while true
+end) -- Fim do spawn
+
+-- Marca que o setup foi concluído e o script (loop) está rodando em background
+_G.AutoplayRoNSimpleLoopLoaded = true
+print("[AUTOPLAY v7] Script carregado. O loop está em execução em segundo plano. Controle via _G.autoplayLigado = true/false.")

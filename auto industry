@@ -103,7 +103,7 @@ task.wait(2) -- Pausa antes da próxima seção
 -------------------------------------------------------------]]
 print("[Combo Final v4] Iniciando detecção e cálculo de fábricas...")
 local metasFabricas = {
-    ["Electronics Factory"] = 2, ["Steel Manufactory"] = 1, ["Motor Factory"] = 1,
+    ["Electronics Factory"] = 1, ["Steel Manufactory"] = 1, ["Motor Factory"] = 1,
     ["Fertilizer Factory"] = 1, ["Civilian Factory"] = 3,
 }
 local contagemAtualFabricas = {}

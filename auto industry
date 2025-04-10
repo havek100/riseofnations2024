@@ -1,203 +1,316 @@
 --[[
-    Script Combinado Final: Compras + Auto Industry Inteligente v4
+    Script RoN: Ações Diversas + Construção "Aleatória" Consistente v9
 
-    Objetivo: Executar uma sequência completa de ações:
-    1. Comprar recursos específicos de nações definidas.
-    2. Detectar fábricas existentes na nação do jogador.
-    3. Construir APENAS as fábricas que faltam para atingir as metas,
-       em cidades aleatórias.
+    Objetivo:
+    1. Executar ações pré-definidas (COMPRAR RECURSOS POR META, pesquisar).
+    2. Detectar fábricas existentes.
+    3. Calcular fábricas necessárias.
+    4. Construir fábricas faltantes com prioridade e em locais consistentes.
 
-    Metas de Fábricas: 2 Eletro, 1 Aço, 1 Motor, 1 Fert, 3 Civil.
+    Novidades v9:
+    - Lógica de compra refeita para comprar até atingir uma META definida para cada recurso.
+    - Para de procurar um recurso específico assim que sua meta é atingida na execução atual.
+
+    Ordem de Prioridade Construção: (Mantida da v8)
+    1. Electronics Factory
+    2. Motor Factory, Steel Manufactory
+    3. Fertilizer Factory, Civilian Factory
+
+    Metas de Fábricas: (Ajuste se necessário)
+    ["Electronics Factory"] = 2, ["Motor Factory"] = 1, ["Steel Manufactory"] = 1,
+    ["Fertilizer Factory"] = 1, ["Civilian Factory"] = 3
+
+    Metas de Compra: (Definidas abaixo)
 
     AVISO: Riscos de banimento associados à automação. Use com cautela.
 ]]
 
-print("[Combo Final v4] Iniciando...")
+print("[RoN Combo v9] Iniciando...")
 
 --[[----------------------------------------------------------
     CONFIGURAÇÕES E SETUP ROBUSTO
 -------------------------------------------------------------]]
-local DELAY_ENTRE_ACOES = 1.5 -- Delay entre compras e construções individuais
-local setupOk = true -- Flag para verificar se o setup foi bem-sucedido
+local DELAY_ENTRE_ACOES = 1.1
+local setupOk = true
 
--- Serviços (com pcall para segurança)
-local Workspace, Players, ReplicatedStorage, RunService
-local localPlayer, GameManager, WorldContainer, CitiesFolder
-local ManageAllianceRemote, CreateBuildingRemote -- Remotes para compra e construção
-
-local function tryGetService(serviceName)
-    local success, service = pcall(game.GetService, game, serviceName)
-    if success and service then print(string.format("[Setup] GetService('%s') OK.", serviceName)) return service
-    else warn(string.format("[Setup] FALHA GetService('%s'): %s", serviceName, tostring(service))) setupOk = false return nil end
-end
-
-Workspace = tryGetService("Workspace")
-Players = tryGetService("Players")
-ReplicatedStorage = tryGetService("ReplicatedStorage")
-RunService = tryGetService("RunService")
-
-if RunService and not RunService:IsClient() then warn("[Setup] ERRO: Script não está rodando no cliente.") setupOk = false end
-
-if Players then
-    local success, player = pcall(function() return Players.LocalPlayer end)
-    if success and player then localPlayer = player; print("[Setup] LocalPlayer OK:", localPlayer.Name) else warn("[Setup] Falha ao obter LocalPlayer:", tostring(player)) setupOk = false end
-else setupOk = false end
-
-if Workspace then
-    local successWC, container = pcall(function() return Workspace:FindFirstChild("Baseplate") or Workspace:FindFirstChild("Map") or Workspace end)
-    if successWC and container then WorldContainer = container; print(string.format("[Setup] WorldContainer encontrado: %s.", WorldContainer.Name))
-        local successCF, folder = pcall(function() return WorldContainer:FindFirstChild("Cities", 10) end)
-        if successCF and folder then CitiesFolder = folder; print("[Setup] Pasta 'Cities' encontrada.") elseif successCF then warn("[Setup] Pasta 'Cities' NÃO encontrada.") setupOk = false else warn("[Setup] Erro ao procurar 'Cities':", tostring(folder)) setupOk = false end
-    else warn("[Setup] Falha ao encontrar WorldContainer:", tostring(container)) setupOk = false end
-else setupOk = false end
-
-if Workspace then
-    local successGM, gm = pcall(Workspace.WaitForChild, Workspace, "GameManager", 20)
-    if successGM and gm then GameManager = gm; print("[Setup] GameManager OK.")
-        local successMAR, mar = pcall(GameManager.WaitForChild, GameManager, "ManageAlliance", 15)
-        if successMAR and mar then ManageAllianceRemote = mar; print("[Setup] ManageAllianceRemote OK.") else warn("[Setup] FALHA ao encontrar ManageAllianceRemote:", tostring(mar)) setupOk = false end
-        local successCBR, cbr = pcall(GameManager.WaitForChild, GameManager, "CreateBuilding", 15)
-        if successCBR and cbr then CreateBuildingRemote = cbr; print("[Setup] CreateBuildingRemote OK.") else warn("[Setup] FALHA ao encontrar CreateBuildingRemote:", tostring(cbr)) setupOk = false end
-    else warn("[Setup] FALHA ao encontrar GameManager:", tostring(gm)) setupOk = false end
-else setupOk = false end
-
-if not setupOk then
-    warn("[Combo Final v4] Setup inicial falhou devido aos erros acima. Script interrompido.")
-    return
-end
-print("[Combo Final v4] Setup inicial concluído com sucesso.")
-
---[[----------------------------------------------------------
-    FUNÇÃO AUXILIAR (Executa Ação Genérica)
--------------------------------------------------------------]]
-local function executarAcao(remoteEvent, arguments, delayTime)
-    if not remoteEvent then warn("RemoteEvent inválido na ação.") return false end
-    local success, err = pcall(function() remoteEvent:FireServer(unpack(arguments)) end)
-    if not success then warn(string.format("Erro na ação %s: %s", remoteEvent.Name, tostring(err))) end
-    task.wait(delayTime or DELAY_ENTRE_ACOES)
-    return success
-end
-
---[[----------------------------------------------------------
-    SEÇÃO 1: COMPRAS ESPECÍFICAS DE RECURSOS
--------------------------------------------------------------]]
-print("[Combo Final v4] Iniciando compras específicas...")
-local comprasEspecificas = {
-    { nation = "Algeria", resource = "Iron", quantity = 4, price = 1 }, { nation = "Liberia", resource = "Iron", quantity = 4, price = 1 },
-    { nation = "Zambia", resource = "Copper", quantity = 4, price = 1 }, { nation = "Zimbabwe", resource = "Gold", quantity = 4, price = 1 },
-    { nation = "Australia", resource = "Titanium", quantity = 4, price = 1 }, { nation = "Senegal", resource = "Titanium", quantity = 4, price = 1 },
-    { nation = "Vietnam", resource = "Tungsten", quantity = 3, price = 1 }, { nation = "Bolivia", resource = "Tungsten", quantity = 3, price = 1 },
-    { nation = "Iraq", resource = "Phosphate", quantity = 4, price = 1 }, { nation = "Senegal", resource = "Phosphate", quantity = 4, price = 1 },
-}
-local comprasTentadas = 0
-for _, compraInfo in ipairs(comprasEspecificas) do
-    local args = {compraInfo.nation,"ResourceTrade",{compraInfo.resource,"Buy",compraInfo.quantity,compraInfo.price,"Trade"}}
-    print(string.format("  -> Comprando %d %s de %s...", compraInfo.quantity, compraInfo.resource, compraInfo.nation))
-    if executarAcao(ManageAllianceRemote, args) then comprasTentadas = comprasTentadas + 1 end
-end
-print(string.format("[Combo Final v4] Compras específicas concluídas. %d comandos enviados.", comprasTentadas))
-task.wait(2) -- Pausa antes da próxima seção
-
---[[----------------------------------------------------------
-    SEÇÃO 2: DETECÇÃO E CÁLCULO DE FÁBRICAS NECESSÁRIAS
--------------------------------------------------------------]]
-print("[Combo Final v4] Iniciando detecção e cálculo de fábricas...")
+-- Metas de Fábricas
 local metasFabricas = {
-    ["Electronics Factory"] = 1, ["Steel Manufactory"] = 1, ["Motor Factory"] = 1,
+    ["Electronics Factory"] = 2, ["Motor Factory"] = 1, ["Steel Manufactory"] = 1,
     ["Fertilizer Factory"] = 1, ["Civilian Factory"] = 3,
 }
-local contagemAtualFabricas = {}
-local fabricasParaConstruirRealmente = {}
-local todasCidadesDaNacao = {}
+
+-- Ordem de Prioridade de Construção
+local buildPriorityOrder = {
+    "Electronics Factory", "Motor Factory", "Steel Manufactory",
+    "Fertilizer Factory", "Civilian Factory"
+}
+
+-- **NOVAS METAS DE COMPRA DE RECURSOS** (Quanto comprar NESTA execução)
+local targetQuantidadesCompra = {
+    Gold = 5,
+    Copper = 5,
+    Iron = 4,
+    Phosphate = 4,
+    Titanium = 3,
+    Tungsten = 2
+}
+
+-- Configuração Padrão das Compras Individuais
+local DEFAULT_COMPRA_QUANTIDADE_POR_TRANSACAO = 3 -- Quanto comprar em CADA tentativa bem-sucedida
+local DEFAULT_COMPRA_PRECO = 1
+
+-- Lista de Fornecedores (Verifique nomes EXATOS do RoN)
+local comprasPlanejadas = {
+    Copper = {"Zambia", "China", "Russia", "Peru", "Kazakhstan"},
+    Gold = {"Ghana", "Canada", "Zimbabwe", "Russia"},
+    Iron = {"Egypt", "United States", "Kazakhstan", "Algeria"},
+    Phosphate = {"Egypt", "Tunisia", "Morocco", "Saudi Arabia"},
+    Titanium = {"Kazakhstan", "Senegal", "Mozambique", "Australia"},
+    Tungsten = {"Russia", "Uzbekistan", "Canada", "Uganda", "Myanmar"}
+}
+
+-- Serviços e Objetos Principais (sem alterações no setup)
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local GameManager = nil
+local WorldContainer = nil
+local CitiesFolder = nil
+local PlayerNationCitiesFolder = nil
 local playerNationName = nil
-local podeConstruir = false -- Flag para saber se a detecção foi bem sucedida
 
-local detectSuccess, detectResult = pcall(function()
-    -- Detecta nação
-    playerNationName = localPlayer:GetAttribute("Country")
-    if not playerNationName then error("Não foi possível detectar a nação (atributo 'Country' ausente ou nulo).") end
-
-    -- Encontra pasta de cidades
-    local PlayerNationCitiesFolder = CitiesFolder and CitiesFolder:FindFirstChild(playerNationName, 5) or nil
-    if not PlayerNationCitiesFolder then error(string.format("Pasta de cidades para '%s' não encontrada.", playerNationName)) end
-
-    -- Lista cidades
-    for _, child in ipairs(PlayerNationCitiesFolder:GetChildren()) do table.insert(todasCidadesDaNacao, child) end
-    if #todasCidadesDaNacao == 0 then error("Nenhuma cidade encontrada na pasta da nação.") end
-    print(string.format("[Combo Final v4] Nação: '%s'. Cidades: %d. Verificando fábricas existentes...", playerNationName, #todasCidadesDaNacao))
-
-    -- Conta fábricas existentes (com pcall interno por cidade)
-    for _, cidadeObj in ipairs(todasCidadesDaNacao) do
-        local scanCitySuccess, scanCityErr = pcall(function()
-             -- !! SUPOSIÇÃO: Edifícios em "Buildings" ou filhos diretos !!
-             local buildingsContainer = cidadeObj:FindFirstChild("Buildings") or cidadeObj
-             if buildingsContainer then
-                 for _, edificioObj in ipairs(buildingsContainer:GetChildren()) do
-                     local nomeEdificio = edificioObj.Name
-                     if metasFabricas[nomeEdificio] then
-                         contagemAtualFabricas[nomeEdificio] = (contagemAtualFabricas[nomeEdificio] or 0) + 1
-                     end
-                 end
+if RunService and not RunService:IsClient() then warn("[Setup] ERRO: Script não está rodando no cliente.") setupOk = false end
+if not localPlayer then warn("[Setup] Falha ao obter LocalPlayer.") setupOk = false
+else
+    print("[Setup] LocalPlayer OK:", localPlayer.Name, "UserID:", localPlayer.UserId)
+    local successNation, nation = pcall(function() return localPlayer:GetAttribute("Country") end)
+    if successNation and nation then playerNationName = nation print("[Setup] Nação detectada:", playerNationName)
+    else warn("[Setup] FALHA ao detectar nação (atributo 'Country'). Construção pode falhar.") end
+end
+if Workspace then
+    WorldContainer = Workspace:FindFirstChild("Baseplate") or Workspace:FindFirstChild("Map") or Workspace
+    if WorldContainer then print("[Setup] WorldContainer encontrado:", WorldContainer.Name)
+        CitiesFolder = WorldContainer:FindFirstChild("Cities")
+        if CitiesFolder then print("[Setup] Pasta 'Cities' encontrada.")
+             if playerNationName then PlayerNationCitiesFolder = CitiesFolder:FindFirstChild(playerNationName)
+                 if PlayerNationCitiesFolder then print("[Setup] Pasta da nação encontrada:", PlayerNationCitiesFolder.Name)
+                 else warn("[Setup] Pasta da nação '"..tostring(playerNationName).."' NÃO encontrada. Construção falhará.") end
              end
-        end)
-        if not scanCitySuccess then warn(string.format("Erro ao escanear cidade %s: %s", cidadeObj.Name, scanCityErr)) end
-    end
-    print("[Combo Final v4] Contagem atual de fábricas:")
-    for tipo, meta in pairs(metasFabricas) do print(string.format("  -> %s: %d / %d", tipo, contagemAtualFabricas[tipo] or 0, meta)) end
+        else warn("[Setup] Pasta 'Cities' NÃO encontrada.") setupOk = false end
+    else warn("[Setup] Falha ao encontrar WorldContainer.") setupOk = false end
+else warn("[Setup] Workspace não encontrado.") setupOk = false end
+if Workspace then
+    local successGM, gm = pcall(Workspace.WaitForChild, Workspace, "GameManager", 20)
+    if successGM and gm then GameManager = gm print("[Setup] GameManager OK.")
+        if not GameManager:FindFirstChild("ManageAlliance") then warn("[Setup] Aviso: Remote 'ManageAlliance' não encontrado.") end
+        if not GameManager:FindFirstChild("ChangeLaw") then warn("[Setup] Aviso: Remote 'ChangeLaw' não encontrado.") end
+        if not GameManager:FindFirstChild("CreateBuilding") then warn("[Setup] Aviso: Remote 'CreateBuilding' não encontrado.") end
+    else warn("[Setup] FALHA CRÍTICA ao encontrar GameManager:", tostring(gm)) setupOk = false end
+else setupOk = false end
 
-    -- Calcula necessárias
-    print("[Combo Final v4] Calculando fábricas necessárias...")
-    for tipoFabrica, metaContagem in pairs(metasFabricas) do
-        local contagemAtual = contagemAtualFabricas[tipoFabrica] or 0
-        local necessarioConstruir = metaContagem - contagemAtual
-        if necessarioConstruir > 0 then
-            print(string.format("  -> Necessário construir %d de '%s'", necessarioConstruir, tipoFabrica))
-            for i = 1, necessarioConstruir do table.insert(fabricasParaConstruirRealmente, tipoFabrica) end
+if not setupOk then warn("[RoN Combo v9] Setup inicial falhou em pontos CRÍTICOS. Script interrompido.") return end
+print("[RoN Combo v9] Setup inicial concluído.")
+task.wait(1)
+
+--[[----------------------------------------------------------
+    FUNÇÕES AUXILIARES (Sem alterações)
+-------------------------------------------------------------]]
+local function executarAcao(remoteName, arguments)
+    if not GameManager then warn("GameManager não encontrado para ação:", remoteName) return false end
+    local remoteEvent = GameManager:FindFirstChild(remoteName)
+    if not remoteEvent or not remoteEvent:IsA("RemoteEvent") then warn(string.format("RemoteEvent '%s' não encontrado ou inválido.", remoteName)) return false end
+    local success, err = pcall(function() remoteEvent:FireServer(unpack(arguments)) end)
+    if not success then warn(string.format("Erro ao executar '%s': %s", remoteName, tostring(err))) end
+    task.wait(DELAY_ENTRE_ACOES)
+    return success
+end
+local function isCountryPlayerControlled(countryName)
+    if not countryName then return false end
+    local playersList = Players:GetPlayers()
+    for _, player in ipairs(playersList) do
+        if player and player ~= localPlayer then
+            local success, pNation = pcall(function() return player:GetAttribute("Country") end)
+            if success and pNation and string.lower(tostring(pNation)) == string.lower(countryName) then return true end
         end
     end
-    podeConstruir = true -- Se chegou até aqui sem erro, a detecção/cálculo foi OK
-end)
-
-if not detectSuccess then
-    warn("[Combo Final v4] Erro durante detecção/cálculo de fábricas:", detectResult)
-    warn("[Combo Final v4] Seção de construção será pulada.")
+    return false
 end
 
 --[[----------------------------------------------------------
-    SEÇÃO 3: CONSTRUÇÃO DAS FÁBRICAS NECESSÁRIAS
+    SEÇÃO 1: COMPRAS POR META E PESQUISA
+    (LÓGICA DE COMPRA ALTERADA)
 -------------------------------------------------------------]]
--- Só executa se a detecção foi bem sucedida, se há fábricas a construir e se há cidades disponíveis
-if podeConstruir and #fabricasParaConstruirRealmente > 0 and #todasCidadesDaNacao > 0 then
-    print(string.format("[Combo Final v4] Iniciando construção de %d fábricas necessárias...", #fabricasParaConstruirRealmente))
-    math.randomseed(os.time())
-    local construcoesFeitas = 0
+print("\n[RoN Combo v9] Iniciando Ações Pré-definidas...")
 
-    for _, nomeFabrica in ipairs(fabricasParaConstruirRealmente) do
-        -- Escolhe cidade aleatória
-        local indiceAleatorio = math.random(1, #todasCidadesDaNacao)
-        local cidadeAleatoriaObj = todasCidadesDaNacao[indiceAleatorio]
-
-        if cidadeAleatoriaObj then
-             print(string.format("  -> Construindo '%s' na cidade aleatória: %s", nomeFabrica, cidadeAleatoriaObj.Name))
-             local args = {{cidadeAleatoriaObj}, nomeFabrica}
-             if executarAcao(CreateBuildingRemote, args) then
-                 construcoesFeitas = construcoesFeitas + 1
-             end
-             -- Opcional: remover cidade?
-        else
-             warn("[Combo Final v4] Erro ao selecionar cidade aleatória.")
-        end
-    end
-    print(string.format("[Combo Final v4] Construção concluída. %d comandos enviados.", construcoesFeitas))
-
-elseif podeConstruir then -- Se a detecção funcionou mas não precisa construir ou não tem cidades
-     if #fabricasParaConstruirRealmente == 0 then
-         print("[Combo Final v4] Nenhuma fábrica nova necessária. Metas atingidas.")
-     else -- #todasCidadesDaNacao deve ser 0 (ou erro no pcall anterior)
-         print("[Combo Final v4] Nenhuma cidade encontrada para construir as fábricas necessárias.")
-     end
+-- Compras de Recursos por Meta
+print(" -> Comprando Recursos por Meta (parando ao atingir a meta por recurso)...")
+local currentQuantidadesCompradas = {} -- Tabela para rastrear o quanto compramos *nesta execução*
+for recurso, _ in pairs(targetQuantidadesCompra) do
+    currentQuantidadesCompradas[recurso] = 0 -- Inicializa contadores
 end
--- Se podeConstruir for false, o aviso de erro já foi dado na seção anterior.
+local totalComandosCompraEnviados = 0
 
-print("[Combo Final v4] Script finalizado.")
+-- Itera através dos recursos que temos uma META de compra
+for recurso, metaQuantidade in pairs(targetQuantidadesCompra) do
+    local metaAlcancadaParaEsteRecurso = false -- Flag para evitar mensagens repetidas
+    print(string.format("\n  --> Meta para %s: %d. Comprado até agora: %d", recurso, metaQuantidade, currentQuantidadesCompradas[recurso]))
+
+    -- Verifica se temos fornecedores listados para este recurso
+    local paisesFornecedores = comprasPlanejadas[recurso]
+    if not paisesFornecedores then
+        warn(string.format("    - Aviso: Nenhum fornecedor listado em 'comprasPlanejadas' para %s.", recurso))
+    else
+        -- Loop através dos países fornecedores para este recurso
+        for _, nomePais in ipairs(paisesFornecedores) do
+            -- **Verificação Principal: Já atingimos a meta para ESTE recurso?**
+            if currentQuantidadesCompradas[recurso] >= metaQuantidade then
+                if not metaAlcancadaParaEsteRecurso then -- Imprime a mensagem de meta atingida apenas uma vez
+                    print(string.format("    - Meta de %s atingida (%d/%d). Parando de procurar por %s.", recurso, currentQuantidadesCompradas[recurso], metaQuantidade, recurso))
+                    metaAlcancadaParaEsteRecurso = true
+                end
+                break -- **Sai do loop de países para ESTE recurso e vai para o PRÓXIMO RECURSO**
+            end
+
+            -- Se a meta ainda não foi atingida, continua a verificação do país
+            print(string.format("    - Verificando %s para %s...", nomePais, recurso))
+
+            local skipCountry = false
+            if isCountryPlayerControlled(nomePais) then
+                print(string.format("      - Pulando %s (Controlado por jogador).", nomePais))
+                skipCountry = true
+            end
+
+            -- Se não for para pular, tenta a compra
+            if not skipCountry then
+                print(string.format("      - Tentando comprar %d %s de %s...", DEFAULT_COMPRA_QUANTIDADE_POR_TRANSACAO, recurso, nomePais))
+                local args = {nomePais, "ResourceTrade", {recurso, "Buy", DEFAULT_COMPRA_QUANTIDADE_POR_TRANSACAO, DEFAULT_COMPRA_PRECO, "Trade"}}
+
+                -- Executa a ação e verifica se foi bem-sucedida
+                if executarAcao("ManageAlliance", args) then
+                    totalComandosCompraEnviados = totalComandosCompraEnviados + 1
+                    -- Incrementa o contador do recurso comprado
+                    currentQuantidadesCompradas[recurso] = currentQuantidadesCompradas[recurso] + DEFAULT_COMPRA_QUANTIDADE_POR_TRANSACAO
+                    print(string.format("        > SUCESSO! Compra de %s em %s. Total %s agora: %d/%d", recurso, nomePais, recurso, currentQuantidadesCompradas[recurso], metaQuantidade))
+
+                    -- **Verifica DE NOVO se a meta foi atingida APÓS esta compra bem-sucedida**
+                    if currentQuantidadesCompradas[recurso] >= metaQuantidade then
+                         if not metaAlcancadaParaEsteRecurso then
+                             print(string.format("        > Meta de %s ATINGIDA (%d/%d) após esta compra. Parando de procurar.", recurso, currentQuantidadesCompradas[recurso], metaQuantidade))
+                             metaAlcancadaParaEsteRecurso = true
+                         end
+                         break -- **Sai do loop de países para ESTE recurso e vai para o PRÓXIMO RECURSO**
+                    end
+                else
+                     -- Apenas avisa se a tentativa falhou, continua para o próximo país
+                     warn(string.format("        > FALHA no comando de compra para %s em %s.", recurso, nomePais))
+                end
+            end -- Fim do if not skipCountry
+        end -- Fim do loop de países para este recurso (ipairs(paisesFornecedores))
+    end -- Fim do if paisesFornecedores
+end -- Fim do loop de recursos (pairs(targetQuantidadesCompra))
+
+print(string.format("\n -> Compras por meta concluídas. %d comandos de compra enviados no total.", totalComandosCompraEnviados))
+print(" -> Resumo das quantidades compradas nesta execução:")
+for recurso, meta in pairs(targetQuantidadesCompra) do
+    print(string.format("    - %s: %d / %d", recurso, currentQuantidadesCompradas[recurso] or 0, meta))
+end
+
+
+-- Pesquisar Tecnologias/Leis (sem alterações)
+print("\n -> Iniciando Pesquisas...")
+local techFolder = ReplicatedStorage:FindFirstChild("Assets") and ReplicatedStorage.Assets:FindFirstChild("Technology")
+if techFolder then
+    local tech1 = techFolder:FindFirstChild("Economic Improvements")
+    local tech2 = techFolder:FindFirstChild("Factory Output 1")
+    local tech3 = techFolder:FindFirstChild("Factory Output 2")
+    if tech1 then executarAcao("ChangeLaw", {"Research", tech1}) else warn("Tecnologia 'Economic Improvements' não encontrada.") end
+    if tech2 then executarAcao("ChangeLaw", {"Research", tech2}) else warn("Tecnologia 'Factory Output 1' não encontrada.") end
+    if tech3 then executarAcao("ChangeLaw", {"Research", tech3}) else warn("Tecnologia 'Factory Output 2' não encontrada.") end
+else
+    warn("Pasta de Tecnologia não encontrada em ReplicatedStorage.Assets.")
+end
+
+print("[RoN Combo v9] Ações Pré-definidas concluídas.")
+task.wait(2)
+
+--[[----------------------------------------------------------
+    SEÇÃO 2: DETECÇÃO DE FÁBRICAS E CÁLCULO DE NECESSIDADES
+    (Sem alterações nesta seção em relação à v8)
+-------------------------------------------------------------]]
+print("\n[RoN Combo v9] Iniciando Detecção e Cálculo de Fábricas...")
+local contagemAtualFabricas = {}
+local todasCidadesDaNacaoObjs = {}
+local podeConstruir = false
+if not playerNationName then warn("[Construção] Nação do jogador não detectada.")
+elseif not PlayerNationCitiesFolder then warn("[Construção] Pasta da nação '"..playerNationName.."' não encontrada.")
+else
+    for _, child in ipairs(PlayerNationCitiesFolder:GetChildren()) do if child:IsA("Model") or child:IsA("Part") then table.insert(todasCidadesDaNacaoObjs, child) end end
+    if #todasCidadesDaNacaoObjs == 0 then warn("[Construção] Nenhuma cidade encontrada.")
+    else
+        print(string.format("[Construção] %d cidades encontradas. Verificando fábricas...", #todasCidadesDaNacaoObjs))
+        local errosScan = 0
+        for _, cidadeObj in ipairs(todasCidadesDaNacaoObjs) do
+            local scanOk, _ = pcall(function()
+                local buildingsContainer = cidadeObj:FindFirstChild("Buildings") or cidadeObj
+                if buildingsContainer then for _, ed in ipairs(buildingsContainer:GetChildren()) do if metasFabricas[ed.Name] then contagemAtualFabricas[ed.Name] = (contagemAtualFabricas[ed.Name] or 0) + 1 end end end
+            end)
+            if not scanOk then errosScan = errosScan + 1 end
+        end
+        if errosScan > 0 then warn("[Construção] Ocorreram", errosScan, "erros ao escanear cidades.") end
+        print("[Construção] Contagem atual:")
+        for tipo, meta in pairs(metasFabricas) do print(string.format("  -> %s: %d / %d", tipo, contagemAtualFabricas[tipo] or 0, meta)) end
+        podeConstruir = true
+    end
+end
+
+--[[----------------------------------------------------------
+    SEÇÃO 3: CONSTRUÇÃO PRIORIZADA E CONSISTENTE
+    (Sem alterações nesta seção em relação à v8)
+-------------------------------------------------------------]]
+if not podeConstruir then print("\n[RoN Combo v9] Construção pulada.")
+else
+    print("\n[RoN Combo v9] Iniciando Construção Priorizada e Consistente...")
+    local necessarioConstruirPorTipo = {}
+    local totalNecessarioGeral = 0
+    print("[Construção] Calculando necessidades:")
+    for tipoFabrica, metaContagem in pairs(metasFabricas) do
+        local contagemAtual = contagemAtualFabricas[tipoFabrica] or 0
+        local necessario = math.max(0, metaContagem - contagemAtual)
+        if necessario > 0 then necessarioConstruirPorTipo[tipoFabrica] = necessario totalNecessarioGeral = totalNecessarioGeral + necessario print(string.format("  -> Necessário construir %d de '%s'", necessario, tipoFabrica)) end
+    end
+    if totalNecessarioGeral == 0 then print("[Construção] Nenhuma fábrica nova necessária.")
+    elseif #todasCidadesDaNacaoObjs == 0 then print("[Construção] Nenhuma cidade disponível para construir.")
+    else
+        print(string.format("[Construção] Total de %d fábricas a serem construídas.", totalNecessarioGeral))
+        math.randomseed(localPlayer.UserId)
+        print("[Construção] Semente aleatória definida com base no UserID:", localPlayer.UserId)
+        local construcoesFeitas = 0
+        local buildAttemptIndex = 0
+        for _, tipoFabricaPriorizada in ipairs(buildPriorityOrder) do
+            if necessarioConstruirPorTipo[tipoFabricaPriorizada] and necessarioConstruirPorTipo[tipoFabricaPriorizada] > 0 then
+                local quantidadeNecessaria = necessarioConstruirPorTipo[tipoFabricaPriorizada]
+                print(string.format("\n  -- Prioridade: Construindo %d de '%s' --", quantidadeNecessaria, tipoFabricaPriorizada))
+                for i = 1, quantidadeNecessaria do
+                    buildAttemptIndex = buildAttemptIndex + 1
+                    local indiceAleatorio = math.random(1, #todasCidadesDaNacaoObjs)
+                    local cidadeEscolhidaObj = todasCidadesDaNacaoObjs[indiceAleatorio]
+                    if cidadeEscolhidaObj then
+                        print(string.format("    [%d/%d Geral] Tentando construir '%s' (%d de %d) na cidade: %s (Índice: %d)", buildAttemptIndex, totalNecessarioGeral, tipoFabricaPriorizada, i, quantidadeNecessaria, cidadeEscolhidaObj.Name, indiceAleatorio))
+                        local args = {{cidadeEscolhidaObj}, tipoFabricaPriorizada}
+                        if executarAcao("CreateBuilding", args) then construcoesFeitas = construcoesFeitas + 1
+                        else warn(string.format("      -> FALHA no comando para construir '%s' em '%s'.", tipoFabricaPriorizada, cidadeEscolhidaObj.Name)) end
+                    else warn(string.format("    [%d/%d Geral] Erro: Não foi possível obter cidade para o índice %d.", buildAttemptIndex, totalNecessarioGeral, indiceAleatorio)) end
+                    task.wait(0.3)
+                end
+                necessarioConstruirPorTipo[tipoFabricaPriorizada] = 0
+            end
+        end
+        print(string.format("\n[Construção] Construção Priorizada concluída. %d comandos enviados.", construcoesFeitas))
+        if construcoesFeitas < totalNecessarioGeral then warn("[Construção] Atenção: Menos comandos enviados do que o total necessário.") end
+    end
+end
+
+print("\n[RoN Combo v9] Script finalizado.")
 -- Fim do Script

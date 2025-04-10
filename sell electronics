@@ -1,115 +1,134 @@
 --[[
-    Script de Venda de Eletrônicos (v6 - Método Reverso: Não Vender para Players)
+    Script de Venda de Eletrônicos Controlado por Toggle (_G) v1.1 - SEM LIMITE
 
-    Objetivo: Vender "Electronics" (quantidade 5, preço 1) automaticamente para
-              todas as nações listadas, EXCETO aquelas que estão sendo controladas
-              por jogadores humanos no servidor.
-              Usa o atributo "Country" no Player para detectar nações controladas.
+    Objetivo: Quando executado, verifica a flag global _G.AutoVendaEletronicosAtivada.
+              Se true, tenta vender "Electronics" (quantidade 5, preço 1) para TODAS
+              as nações não-jogadoras listadas, sem um limite de quantidade total.
+              Se false, encerra a execução imediatamente.
 
-    AVISO: Usar scripts para automação viola os Termos de Serviço do Roblox
-    e as regras de Rise of Nations. Risco de banimento. Use por sua conta e risco.
+    Novidade v1.1: Removido o limite de venda total. Tenta vender para todos na lista.
+
+    AVISO: Risco de banimento por automação.
 ]]
+
+-- Verifica a Flag Global definida pelo Callback do Toggle
+if not _G.AutoVendaEletronicosAtivada then
+    print("[Venda Eletronicos SL] Toggle está DESATIVADO. Script não será executado.")
+    return -- Encerra o script
+end
+
+print("[Venda Eletronicos SL] Toggle está ATIVADO. Iniciando ciclo de vendas SEM LIMITE...")
 
 -- Serviços e Atalhos Principais
 local Workspace = game:GetService("Workspace")
-local Players = game:GetService("Players") -- Serviço para listar jogadores
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
 
-local localPlayer = Players.LocalPlayer -- O próprio jogador
+-- Tenta encontrar o GameManager e o RemoteEvent
+local GameManager, ManageAllianceRemote
+local setupOk = true
 
-local GameManager = Workspace:WaitForChild("GameManager")
-local ManageAllianceRemote = GameManager:WaitForChild("ManageAlliance") -- Remote para trocas
+local successGM, gm = pcall(function() return Workspace:WaitForChild("GameManager", 5) end)
+if successGM and gm then
+    GameManager = gm
+    local successRemote, remote = pcall(function() return GameManager:WaitForChild("ManageAlliance", 5) end)
+    if successRemote and remote then
+        ManageAllianceRemote = remote
+    else
+        warn("[Venda Eletronicos SL] ERRO: RemoteEvent 'ManageAlliance' não encontrado.")
+        setupOk = false
+    end
+else
+    warn("[Venda Eletronicos SL] ERRO: 'GameManager' não encontrado.")
+    setupOk = false
+end
 
--- Função Auxiliar para Executar Ações (Reutilizada)
+if not setupOk then
+    warn("[Venda Eletronicos SL] Falha no setup inicial. Abortando.")
+    return
+end
+
+-- Função Auxiliar para Executar Ações (retorna sucesso do envio)
 local function executarAcao(remoteEvent, arguments, delayTime)
-    if not remoteEvent then
-        warn("Tentativa de usar um RemoteEvent inválido.")
-        return
-    end
-    local success, err = pcall(function()
-        remoteEvent:FireServer(unpack(arguments))
-    end)
-    if not success then
-        warn(string.format("Erro ao executar ação para %s: %s", remoteEvent.Name, tostring(err)))
-    end
-    task.wait(delayTime or 1) -- Espera 1 segundo por padrão
+    if not remoteEvent then warn("RemoteEvent inválido.") return false end
+    local success, err = pcall(function() remoteEvent:FireServer(unpack(arguments)) end)
+    if not success then warn(string.format("Erro ao executar ação: %s", tostring(err))) end
+    task.wait(delayTime or 1)
+    return success
 end
 
 -- ============================================
--- CONFIGURAÇÕES DA VENDA DE ELETRÔNICOS
+-- CONFIGURAÇÕES DA VENDA
 -- ============================================
 local RESOURCE_TO_SELL = "Electronics"
-local QUANTITY_TO_SELL = 5
+local QUANTITY_PER_SALE = 5
 local PRICE_PER_UNIT = 1
 local TRADE_ACTION = "Sell"
-local TRADE_TYPE = "Trade" -- 5º item na tabela interna de args
+local TRADE_TYPE = "Trade"
+-- local LIMITE_VENDA_TOTAL = 50 -- REMOVIDO
 
 -- ===================================
--- DADOS DAS VENDAS TOTAIS (Potenciais) - LISTA ATUALIZADA
+-- LISTA DE PAÍSES (Verifique os nomes!)
 -- ===================================
--- Tabela contendo as nações para as quais vender Eletrônicos. Usa o NOME BASE.
 local vendasPotenciais = {
     { nation = "Japan" }, { nation = "Mexico" }, { nation = "India" }, { nation = "China" },
     { nation = "United States" }, { nation = "Bangladesh" }, { nation = "Argentina" }, { nation = "Pakistan" },
     { nation = "Egypt" }, { nation = "Russia" }, { nation = "Philippines" }, { nation = "Turkey" },
     { nation = "South Korea" }, { nation = "Nigeria" }, { nation = "Indonesia" }, { nation = "United Kingdom" },
     { nation = "Peru" }, { nation = "Iran" }, { nation = "Colombia" },
-    { nation = "Democratic Republic of the Congo" }, -- Nome longo, verificar se está correto no jogo
+    { nation = "Democratic Republic of the Congo" },
     { nation = "Hong Kong" }, { nation = "Taiwan" }, { nation = "Thailand" },
-    -- { nation = "Iran" }, -- Duplicado na lista original, removido aqui para evitar redundância, mas pode adicionar se quiser tentar 2x
     { nation = "Canada" }, { nation = "Vietnam" }, { nation = "Singapore" }, { nation = "Chile" },
-    { nation = "Angola" }, { nation = "Iraq" }, { nation = "Burma" }, { nation = "Saudi Arabia" },
-    { nation = "Australia" }, { nation = "Sudan" }, { nation = "South Africa" }, { nation = "Cote d'Ivoire" },
-    { nation = "Germany" }, { nation = "Italy" },
-    -- Adicione mais nações aqui se necessário, apenas o nome base.
+    { nation = "Angola" }, { nation = "Iraq" }, { nation = "Burma" }, -- ou "Myanmar"
+    { nation = "Saudi Arabia" }, { nation = "Australia" }, { nation = "Sudan" },
+    { nation = "South Africa" }, { nation = "Cote d'Ivoire" }, { nation = "Germany" }, { nation = "Italy" },
 }
 
 -- ========================================================
--- LOOP PRINCIPAL DE VENDAS (COM VERIFICAÇÃO DE PLAYERS)
+-- LOOP PRINCIPAL DE VENDAS (SEM LIMITE)
 -- ========================================================
-print(string.format("[SCRIPT] Iniciando ciclo de vendas de '%s', pulando nações controladas por players...", RESOURCE_TO_SELL))
-local vendasFeitas = 0
+print(string.format("[Venda Eletronicos SL] Iniciando ciclo de vendas de '%s'...", RESOURCE_TO_SELL))
+-- local totalVendidoNestaExecucao = 0 -- REMOVIDO
 local vendasPuladas = 0
+local comandosEnviados = 0
 
+-- Loop principal que tenta vender para cada país na lista
 for i, vendaInfo in ipairs(vendasPotenciais) do
+    -- Verificação de limite REMOVIDA
+
     local targetNationName = vendaInfo.nation
     local isPlayerControlled = false
 
-    -- Verifica se algum jogador no servidor controla esta nação
+    -- Verifica se é jogador
     local currentPlayers = Players:GetPlayers()
     for _, player in ipairs(currentPlayers) do
         if player ~= localPlayer then
-            local playerNation = player:GetAttribute("Country") -- Usa o atributo "Country"
-            if playerNation and playerNation == targetNationName then
+            local success, playerNation = pcall(function() return player:GetAttribute("Country") end)
+            if success and playerNation and playerNation == targetNationName then
                 isPlayerControlled = true
                 vendasPuladas = vendasPuladas + 1
-                -- print(string.format("  -> Pulando %s (Controlado por: %s)", targetNationName, player.Name)) -- Log opcional
                 break
             end
         end
     end
 
-    -- Se NENHUM jogador controla a nação, tenta vender
+    -- Se não for jogador, tenta vender
     if not isPlayerControlled then
-        -- print(string.format("  -> %s não é controlada por jogador. Tentando vender %s...", targetNationName, RESOURCE_TO_SELL)) -- Log opcional
-
-        -- Monta os argumentos usando o NOME BASE da nação e as constantes definidas
         local args = {
-            targetNationName,           -- Nome Base da Nação
-            "ResourceTrade",            -- Tipo de Ação
-            {                           -- Detalhes da Troca
-                RESOURCE_TO_SELL,       -- Recurso (Constante)
-                TRADE_ACTION,           -- Ação (Constante)
-                QUANTITY_TO_SELL,       -- Quantidade (Constante)
-                PRICE_PER_UNIT,         -- Preço (Constante)
-                TRADE_TYPE              -- Tipo/Confirmação (Constante)
-            }
+            targetNationName, "ResourceTrade",
+            { RESOURCE_TO_SELL, TRADE_ACTION, QUANTITY_PER_SALE, PRICE_PER_UNIT, TRADE_TYPE }
         }
 
-        -- Executa a ação
-        executarAcao(ManageAllianceRemote, args)
-        vendasFeitas = vendasFeitas + 1
+        -- Tenta executar e conta o comando enviado se o envio foi bem-sucedido
+        if executarAcao(ManageAllianceRemote, args) then
+            comandosEnviados = comandosEnviados + 1
+            -- Linha que incrementava totalVendidoNestaExecucao REMOVIDA
+            print(string.format("  -> Venda de %d %s para %s enviada.", QUANTITY_PER_SALE, RESOURCE_TO_SELL, targetNationName))
+        else
+             print(string.format("  -> FALHA ao enviar comando de venda para %s.", targetNationName))
+        end
     end
-end
+end -- Fim do loop for ipairs(vendasPotenciais)
 
-print(string.format("[SCRIPT] Ciclo de vendas de '%s' concluído. Vendas tentadas: %d. Vendas puladas (players): %d.", RESOURCE_TO_SELL, vendasFeitas, vendasPuladas))
--- Fim do Script
+print(string.format("[Venda Eletronicos SL] Ciclo de vendas concluído. Comandos enviados: %d. Vendas puladas (players): %d.", comandosEnviados, vendasPuladas))
+-- Fim do Script Baixado

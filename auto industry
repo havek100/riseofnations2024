@@ -17,7 +17,7 @@
     3. Fertilizer Factory, Civilian Factory
 
     Metas de Fábricas: (Ajuste se necessário)
-    ["Electronics Factory"] = 2, ["Motor Factory"] = 1, ["Steel Manufactory"] = 1,
+    ["Electronics Factory"] = 1, ["Motor Factory"] = 1, ["Steel Manufactory"] = 1,
     ["Fertilizer Factory"] = 1, ["Civilian Factory"] = 3
 
     Metas de Compra: (Definidas abaixo)

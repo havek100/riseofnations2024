@@ -30,7 +30,7 @@ print("[RoN Combo v9] Iniciando...")
 --[[----------------------------------------------------------
     CONFIGURAÇÕES E SETUP ROBUSTO
 -------------------------------------------------------------]]
-local DELAY_ENTRE_ACOES = 1.1
+local DELAY_ENTRE_ACOES = 3
 local setupOk = true
 
 -- Metas de Fábricas
@@ -66,7 +66,7 @@ local comprasPlanejadas = {
     Iron = {"Egypt", "United States", "Kazakhstan", "Algeria"},
     Phosphate = {"Egypt", "Tunisia", "Morocco", "Saudi Arabia"},
     Titanium = {"Kazakhstan", "Senegal", "Mozambique", "Australia"},
-    Tungsten = {"Russia", "Uzbekistan", "Canada", "Uganda", "Myanmar"}
+    Tungsten = {"Russia", "Uzbekistan", "Canada", "Uganda", "Vietnam"}
 }
 
 -- Serviços e Objetos Principais (sem alterações no setup)

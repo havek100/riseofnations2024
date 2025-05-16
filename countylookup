@@ -1,0 +1,273 @@
+--[[
+    Country Lookup GUI - Standalone for Loadstring (Uses Real Game Data)
+    Versão: 1.4.1
+    - CORREÇÃO: Manpower busca de CountryData.País.Manpower (assumindo que Manpower é o ValueBase).
+    - Lista de Fábricas e Recursos conforme último ajuste.
+    - Rolagem funcionando.
+]]
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+print("LOADSTRING: Country Lookup GUI (Real Data v1.4.1) - Initializing...")
+
+local countryLookupScreenGui_standalone = nil
+local mainLookupFrame_standalone = nil
+local countryNameInput_standalone = nil
+local resultsFrame_standalone = nil
+local infoLabels_standalone = {}
+local uiListLayout_standalone = nil
+
+local resourcesToDisplay_standalone = {
+    "Aluminium", "Chromium", "Consumer Goods", "Diamond", "Electronics",
+    "Fertilizer", "Gold", "Iron", "Motor Parts", "Oil", 
+    "Phosphate", "Steel", "Titanium", "Tungsten", "Uranium"
+}
+local factoryTypesToDisplay_standalone = {
+    "Electronics Factory", "Steel Manufactory", "Motor Factory",
+    "Aircraft Factory", "Civilian Factory", "Fertilizer Factory"
+}
+
+-- Funções Utilitárias (Minimamente necessárias para este script standalone)
+local function getResourceData_standalone(countryName, resourceName, dataType)
+    local cd = Workspace:FindFirstChild("CountryData"); if not cd then return nil, "NCD" end
+    local cf = cd:FindFirstChild(countryName); if not cf then return nil, "NCF:"..tostring(countryName) end
+    local rsf = cf:FindFirstChild("Resources"); if not rsf then return nil, "NRS" end
+    local rn = rsf:FindFirstChild(resourceName); if not rn then return nil, "NRN:"..tostring(resourceName) end
+    if dataType == "Stock" then if rn:IsA("ValueBase") then return rn.Value, nil else return nil, "S!VB" end
+    elseif dataType == "Flow" then local fn = rn:FindFirstChild("Flow"); if fn and fn:IsA("ValueBase") then return fn.Value, nil else return nil, "F!VB" end
+    else return nil, "IDT" end
+end
+
+local function getAllCities_standalone(countryName)
+    local cl={};local b=Workspace:FindFirstChild("Baseplate");if not b then return cl,"NB"end;local cr=b:FindFirstChild("Cities");if not cr then return cl,"NCR"end
+    local ccf=cr:FindFirstChild(countryName)
+    if not ccf then local ni=countryName:lower():gsub("%s+",""):gsub("of",""):gsub("the","");for _,fld in ipairs(cr:GetChildren())do local fldNi=fld.Name:lower():gsub("%s+",""):gsub("of",""):gsub("the","");if fldNi==ni then ccf=fld;break end end;if not ccf then return cl,"NCFF:"..tostring(countryName)end end
+    for _,ci in ipairs(ccf:GetChildren())do table.insert(cl,{Name=ci.Name,Instance=ci})end;if #cl==0 then return cl,"NCI"end;return cl,nil
+end
+
+local function countCityFactories_standalone(cityInstance, factoryType)
+    local c=0;local bc=cityInstance:FindFirstChild("Buildings")or cityInstance;if bc then for _,bld in ipairs(bc:GetChildren())do if bld.Name==factoryType then c=c+1 end end end;return c
+end
+
+local function getCountryBalanceAmount_standalone(countryName)
+    local cd=Workspace:FindFirstChild("CountryData");if not cd then return nil,"NCD"end;local cf=cd:FindFirstChild(countryName);if not cf then return nil,"NCF"end
+    local ef=cf:FindFirstChild("Economy");if not ef then return nil,"NEF"end;local bi=ef:FindFirstChild("Balance");if not bi then return nil,"NBI"end
+    if not(bi:IsA("IntValue")or bi:IsA("NumberValue"))then return nil,"BNT"end;if type(bi.Value)=="number"then return bi.Value,nil else return nil,"BNV"end
+end
+
+local function getCountryEconomyInfo_standalone(countryName)
+    local cd=Workspace:FindFirstChild("CountryData");if not cd then return nil,nil,"NCD"end;local cf=cd:FindFirstChild(countryName);if not cf then return nil,nil,"NCF"end
+    local ef=cf:FindFirstChild("Economy");if not ef then return nil,nil,"NEF"end
+    local revA=ef:FindFirstChild("Revenue")and ef.Revenue:GetAttribute("Total");local expA=ef:FindFirstChild("Expenses")and ef.Expenses:GetAttribute("Total")
+    if type(revA)~="number"then return nil,nil,"BRT"end;if type(expA)~="number"then return nil,nil,"BET"end;return revA,expA,nil
+end
+
+local function isAICountry_standalone(countryName)
+    if not countryName then return true end;for _,p in ipairs(Players:GetPlayers())do if p:GetAttribute("Country")==countryName then return false end end;return true
+end
+
+local function getTotalFactoryCountForType_standalone(countryName, factoryType)
+    local cities,cityErr=getAllCities_standalone(countryName);if cityErr or not cities or #cities==0 then return 0 end
+    local total=0;for _,cD in ipairs(cities)do if cD.Instance then total=total+countCityFactories_standalone(cD.Instance,factoryType)end end;return total
+end
+
+local function getCountryDivisionsCount_standalone(countryName)
+    local uf=Workspace:FindFirstChild("Units");if not uf then return 0,"NUF"end;local c=0;for _,u in ipairs(uf:GetChildren())do local oV=u:FindFirstChild("Owner");if oV and oV.Value==countryName then c=c+1 end end;return c,nil
+end
+
+-- CORRIGIDO: Manpower
+local function getCountryAvailableManpower_standalone(countryName)
+    local countryDataFolder = Workspace:FindFirstChild("CountryData")
+    if not countryDataFolder then return 0, "CountryData folder not found" end
+    local specificCountryFolder = countryDataFolder:FindFirstChild(countryName)
+    if not specificCountryFolder then return 0, "Specific country folder '"..tostring(countryName).."' not found" end
+
+    local manpowerInstance = specificCountryFolder:FindFirstChild("Manpower") -- "Manpower" é o objeto direto
+
+    if manpowerInstance then
+        -- Verifica se este objeto "Manpower" é um ValueBase (NumberValue, IntValue, etc.)
+        if manpowerInstance:IsA("ValueBase") then
+            if type(manpowerInstance.Value) == "number" then
+                return manpowerInstance.Value, nil -- Retorna o valor diretamente
+            else
+                return 0, "Manpower.Value is not a number, type: " .. type(manpowerInstance.Value)
+            end
+        else
+            -- Se manpowerInstance existe mas NÃO é um ValueBase, o erro anterior ("MP inst not ValueBase: Folder") estava correto.
+            -- Mas se o erro que você viu AGORA diz que manpowerInstance É nil, então o problema é que "Manpower" não foi encontrado.
+            return 0, "Instance 'Manpower' for " .. countryName .. " is NOT ValueBase. Class: " .. manpowerInstance.ClassName
+        end
+    else
+        return 0, "Instance 'Manpower' NOT FOUND in " .. countryName
+    end
+end
+
+
+local function PerformLookup_standalone()
+    if not countryNameInput_standalone or not resultsFrame_standalone or not countryLookupScreenGui_standalone or not countryLookupScreenGui_standalone.Enabled then return end
+    local countryToSearch = countryNameInput_standalone.Text
+    if countryToSearch == "" then infoLabels_standalone["Status"].Text = "Status: Enter a country name."; return end
+
+    infoLabels_standalone["Status"].Text = "Status: Searching for " .. countryToSearch .. "..."
+    local countryDataFolder = Workspace:FindFirstChild("CountryData") and Workspace.CountryData:FindFirstChild(countryToSearch)
+
+    if not countryDataFolder then
+        infoLabels_standalone["Status"].Text = "Status: Country '"..countryToSearch.."' not found."
+        local fieldsToClear = {"Owner", "Population", "CitiesCount", "Balance", "Revenue", "Expenses", "DivisionsCount", "ManpowerAvailable", "Stability"}
+        for _, fieldName in ipairs(fieldsToClear) do if infoLabels_standalone[fieldName] then infoLabels_standalone[fieldName].Text = fieldName:gsub("Count",""):gsub("Available"," (Avail.)") .. ": N/A" end end
+        if infoLabels_standalone["FlagImage"] then infoLabels_standalone["FlagImage"].Image = ""; infoLabels_standalone["FlagImage"].BackgroundTransparency = 0.5 end
+        for i = 1, 20 do if infoLabels_standalone["ResourceInfo"..i] then infoLabels_standalone["ResourceInfo"..i].Text = "" end end
+        for i = 1, 10 do if infoLabels_standalone["FactoryInfo"..i] then infoLabels_standalone["FactoryInfo"..i].Text = "" end end
+        return
+    end
+
+    if infoLabels_standalone["FlagImage"] then
+        local flagAssetFolder = ReplicatedStorage:FindFirstChild("Assets") and ReplicatedStorage.Assets:FindFirstChild("Flag")
+        if flagAssetFolder then
+            local flagInstance = flagAssetFolder:FindFirstChild(countryToSearch)
+            if flagInstance and flagInstance:IsA("ImageLabel") and flagInstance.Image ~= "" then infoLabels_standalone["FlagImage"].Image = flagInstance.Image; infoLabels_standalone["FlagImage"].BackgroundTransparency = 1
+            elseif flagInstance and flagInstance:IsA("Decal") and flagInstance.Texture ~= "" then infoLabels_standalone["FlagImage"].Image = flagInstance.Texture; infoLabels_standalone["FlagImage"].BackgroundTransparency = 1
+            else infoLabels_standalone["FlagImage"].Image = ""; infoLabels_standalone["FlagImage"].BackgroundTransparency = 0.5 end
+        else infoLabels_standalone["FlagImage"].Image = ""; infoLabels_standalone["FlagImage"].BackgroundTransparency = 0.5 end
+    end
+
+    if isAICountry_standalone(countryToSearch) then infoLabels_standalone["Owner"].Text = "Owner: AI Controlled"
+    else local oPN="Player(N/A)";for _,p in ipairs(Players:GetPlayers())do if p:GetAttribute("Country")==countryToSearch then oPN="Player:"..p.Name;break end end;infoLabels_standalone["Owner"].Text="Owner:"..oPN end
+
+    local cities,cityErr=getAllCities_standalone(countryToSearch);local totalPop=0;local cityCt=0
+    if not cityErr and cities and #cities>0 then cityCt=#cities;for _,cD in ipairs(cities)do if cD.Instance then local p=cD.Instance:GetAttribute("Population");totalPop=totalPop+(type(p)=="number"and p or 0)end end
+        local popS=totalPop;if totalPop>=1e6 then popS=string.format("%.1fM",totalPop/1e6)elseif totalPop>=1e3 then popS=string.format("%.0fK",totalPop/1e3)end
+        infoLabels_standalone["Population"].Text=string.format("Population: ~%s",popS);infoLabels_standalone["CitiesCount"].Text="Cities:"..cityCt
+    else infoLabels_standalone["Population"].Text="Population:N/A";infoLabels_standalone["CitiesCount"].Text="Cities:N/A" end
+    
+    local dataCD=countryDataFolder:FindFirstChild("Data");if dataCD then local stabV=dataCD:FindFirstChild("Stability");if stabV and stabV:IsA("ValueBase")then infoLabels_standalone["Stability"].Text=string.format("Stability: %.1f%%",(type(stabV.Value)=="number"and stabV.Value or 0))else infoLabels_standalone["Stability"].Text="Stability:N/A(V)"end else infoLabels_standalone["Stability"].Text="Stability:N/A(D)"end
+
+    local bal,bE=getCountryBalanceAmount_standalone(countryToSearch);local rev,exp,ecoE=getCountryEconomyInfo_standalone(countryToSearch)
+    infoLabels_standalone["Balance"].Text=bE and "Balance:Err" or string.format("Balance:$%.0f",bal or 0)
+    if ecoE then infoLabels_standalone["Revenue"].Text="Revenue:Err";infoLabels_standalone["Expenses"].Text="Expenses:Err" else infoLabels_standalone["Revenue"].Text=string.format("Revenue:$%.0f",rev or 0);infoLabels_standalone["Expenses"].Text=string.format("Expenses:$%.0f",exp or 0)end
+
+    local divs,divE=getCountryDivisionsCount_standalone(countryToSearch);infoLabels_standalone["DivisionsCount"].Text=divE and "Divisions:Err"or"Divisions:"..divs
+    
+    local availMP,mpE=getCountryAvailableManpower_standalone(countryToSearch) -- MANPOWER ATUALIZADO
+    if mpE then infoLabels_standalone["ManpowerAvailable"].Text="Manpower(Avail.): Error ("..mpE..")" 
+    else local mpS=availMP;if availMP>=1e6 then mpS=string.format("%.1fM",availMP/1e6)elseif availMP>=1e3 then mpS=string.format("%.0fK",availMP/1e3)end;infoLabels_standalone["ManpowerAvailable"].Text=string.format("Manpower(Avail.):~%s",mpS)end
+
+    infoLabels_standalone["ResourcesTitle"].Text = "--- Resources (Stock | Flow) ---"
+    for i=1,#resourcesToDisplay_standalone do local rN=resourcesToDisplay_standalone[i];if infoLabels_standalone["ResourceInfo"..i]then local s,sE=getResourceData_standalone(countryToSearch,rN,"Stock");local f,fE=getResourceData_standalone(countryToSearch,rN,"Flow");local rT=rN..": ";if sE or fE then rT=rT.."N/A"else rT=rT..string.format("%.0f|%s%.1f",s or 0,(f or 0)>=0 and"+"or"",f or 0)end;infoLabels_standalone["ResourceInfo"..i].Text=rT end end
+    for i=#resourcesToDisplay_standalone+1,20 do if infoLabels_standalone["ResourceInfo"..i]then infoLabels_standalone["ResourceInfo"..i].Text=""end end
+
+    infoLabels_standalone["FactoriesTitle"].Text = "--- Factories ---"
+    for i=1,#factoryTypesToDisplay_standalone do local fN=factoryTypesToDisplay_standalone[i];if infoLabels_standalone["FactoryInfo"..i]then local ct=getTotalFactoryCountForType_standalone(countryToSearch,fN);infoLabels_standalone["FactoryInfo"..i].Text=fN..":"..ct end end
+    for i=#factoryTypesToDisplay_standalone+1,10 do if infoLabels_standalone["FactoryInfo"..i]then infoLabels_standalone["FactoryInfo"..i].Text=""end end
+    
+    infoLabels_standalone["Status"].Text = "Status: Displaying info for " .. countryToSearch
+    task.wait() 
+    if resultsFrame_standalone and uiListLayout_standalone then
+        resultsFrame_standalone.CanvasSize = UDim2.fromOffset(0, uiListLayout_standalone.AbsoluteContentSize.Y + 10)
+    end
+end
+
+local function CreateCountryLookupGUI_Standalone()
+    if PlayerGui:FindFirstChild("CountryLookupGUI_Standalone") then
+        countryLookupScreenGui_standalone = PlayerGui:FindFirstChild("CountryLookupGUI_Standalone")
+        countryLookupScreenGui_standalone.Enabled = not countryLookupScreenGui_standalone.Enabled
+        print("Standalone GUI Toggled:", countryLookupScreenGui_standalone.Enabled); return
+    end
+
+    countryLookupScreenGui_standalone = Instance.new("ScreenGui", PlayerGui)
+    countryLookupScreenGui_standalone.Name = "CountryLookupGUI_Standalone"
+    countryLookupScreenGui_standalone.ResetOnSpawn = false; countryLookupScreenGui_standalone.DisplayOrder = 1001; countryLookupScreenGui_standalone.Enabled = true
+
+    mainLookupFrame_standalone = Instance.new("Frame", countryLookupScreenGui_standalone)
+    mainLookupFrame_standalone.Name = "MainLookupFrame_Standalone"; mainLookupFrame_standalone.Size = UDim2.new(0, 440, 0, 700) 
+    mainLookupFrame_standalone.AnchorPoint = Vector2.new(0.5, 0.5); mainLookupFrame_standalone.Position = UDim2.new(0.5, 0, 0.5, 0)
+    mainLookupFrame_standalone.BackgroundColor3 = Color3.fromRGB(38, 38, 42); mainLookupFrame_standalone.BorderColor3 = Color3.fromRGB(18, 18, 20)
+    mainLookupFrame_standalone.BorderSizePixel = 2; mainLookupFrame_standalone.Active = true; mainLookupFrame_standalone.Draggable = true 
+
+    local titleLabel = Instance.new("TextLabel", mainLookupFrame_standalone); titleLabel.Name = "TitleLabel"; titleLabel.Size = UDim2.new(1, 0, 0, 30)
+    titleLabel.BackgroundColor3 = Color3.fromRGB(28, 28, 30); titleLabel.TextColor3 = Color3.fromRGB(225, 225, 225)
+    titleLabel.Text = "Country Lookup (Real Data)"; titleLabel.Font = Enum.Font.GothamSemibold; titleLabel.TextSize = 17
+
+    countryNameInput_standalone = Instance.new("TextBox", mainLookupFrame_standalone); countryNameInput_standalone.Name = "CountryNameInput"
+    countryNameInput_standalone.Size = UDim2.new(1, -105, 0, 32); countryNameInput_standalone.Position = UDim2.new(0, 10, 0, 35)
+    countryNameInput_standalone.BackgroundColor3 = Color3.fromRGB(50, 52, 55); countryNameInput_standalone.BorderColor3 = Color3.fromRGB(25, 25, 28)
+    countryNameInput_standalone.TextColor3 = Color3.fromRGB(240, 240, 240); countryNameInput_standalone.PlaceholderText = "Enter country name..."
+    countryNameInput_standalone.Font = Enum.Font.SourceSans; countryNameInput_standalone.TextSize = 15; countryNameInput_standalone.ClearTextOnFocus = false
+
+    local searchButton = Instance.new("TextButton", mainLookupFrame_standalone); searchButton.Name = "SearchButton"
+    searchButton.Size = UDim2.new(0, 85, 0, 32); searchButton.Position = UDim2.new(1, -95, 0, 35)
+    searchButton.BackgroundColor3 = Color3.fromRGB(0, 122, 204); searchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    searchButton.Text = "Search"; searchButton.Font = Enum.Font.GothamSemibold; searchButton.TextSize = 15
+    
+    infoLabels_standalone["FlagImage"] = Instance.new("ImageLabel", mainLookupFrame_standalone); infoLabels_standalone["FlagImage"].Name = "FlagImageDisplay"
+    infoLabels_standalone["FlagImage"].Size = UDim2.new(0, 100, 0, 60); infoLabels_standalone["FlagImage"].Position = UDim2.new(0.5, -50, 0, 75)
+    infoLabels_standalone["FlagImage"].BackgroundTransparency = 1; infoLabels_standalone["FlagImage"].BorderSizePixel = 1
+    infoLabels_standalone["FlagImage"].BorderColor3 = Color3.fromRGB(100,100,100); infoLabels_standalone["FlagImage"].Image = ""; infoLabels_standalone["FlagImage"].ScaleType = Enum.ScaleType.Fit
+
+    local closeButton = Instance.new("TextButton", titleLabel); closeButton.Name = "CloseButton"; closeButton.Size = UDim2.new(0, 25, 0, 25)
+    closeButton.Position = UDim2.new(1, -28, 0, 3); closeButton.BackgroundColor3 = Color3.fromRGB(210, 40, 40)
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255); closeButton.Text = "X"; closeButton.Font = Enum.Font.SourceSansBold
+    closeButton.TextSize = 16; closeButton.ZIndex = 2
+
+    resultsFrame_standalone = Instance.new("ScrollingFrame", mainLookupFrame_standalone); resultsFrame_standalone.Name = "ResultsFrame"
+    resultsFrame_standalone.AnchorPoint = Vector2.new(0.5, 0); resultsFrame_standalone.Position = UDim2.new(0.5, 0, 0, 145) 
+    resultsFrame_standalone.Size = UDim2.new(1, -20, 0, 545)
+    resultsFrame_standalone.BackgroundColor3 = Color3.fromRGB(42, 42, 45); resultsFrame_standalone.BorderColor3 = Color3.fromRGB(18, 18, 20)
+    resultsFrame_standalone.BorderSizePixel = 1; resultsFrame_standalone.ScrollBarThickness = 8
+    resultsFrame_standalone.ScrollBarImageColor3 = Color3.fromRGB(90,90,90)
+    resultsFrame_standalone.ScrollingDirection = Enum.ScrollingDirection.Y
+    resultsFrame_standalone.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    resultsFrame_standalone.CanvasSize = UDim2.new(0,0,0,0) 
+
+    uiListLayout_standalone = Instance.new("UIListLayout", resultsFrame_standalone)
+    uiListLayout_standalone.Padding = UDim.new(0, 4) 
+    uiListLayout_standalone.SortOrder = Enum.SortOrder.LayoutOrder
+    uiListLayout_standalone.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    uiListLayout_standalone.FillDirection = Enum.FillDirection.Vertical
+
+    local labelOrderAndPlaceholders_standalone = {
+        {Name = "Status", Placeholder = "Status: Ready", TextColor = Color3.fromRGB(220,220,100), TextSize = 15},
+        {Name = "Owner", Placeholder = "Owner: ..."}, {Name = "Population", Placeholder = "Population: ..."},
+        {Name = "CitiesCount", Placeholder = "Cities: ..."}, {Name = "Stability", Placeholder = "Stability: ..."},
+        {Name = "Balance", Placeholder = "Balance: $..."}, {Name = "Revenue", Placeholder = "Revenue (T): $..."},
+        {Name = "Expenses", Placeholder = "Expenses (T): $..."}, 
+        {Name = "DivisionsCount", Placeholder = "Divisions: ..."}, 
+        {Name = "ManpowerAvailable", Placeholder = "Manpower (Avail.): ..."}, -- LABEL ADICIONADO
+        {Name = "ResourcesTitle", Placeholder = "--- Resources (Stock | Flow) ---", IsTitle = true},
+    }
+    for i = 1, #resourcesToDisplay_standalone do table.insert(labelOrderAndPlaceholders_standalone, {Name = "ResourceInfo"..i, Placeholder = resourcesToDisplay_standalone[i]..": ..."}) end
+    table.insert(labelOrderAndPlaceholders_standalone, {Name = "FactoriesTitle", Placeholder = "--- Factories ---", IsTitle = true})
+    for i = 1, #factoryTypesToDisplay_standalone do table.insert(labelOrderAndPlaceholders_standalone, {Name = "FactoryInfo"..i, Placeholder = factoryTypesToDisplay_standalone[i]..": ..."}) end
+    
+    local currentLayoutOrder = 1
+    for _, lblData in ipairs(labelOrderAndPlaceholders_standalone) do
+        local infoLabel = Instance.new("TextLabel", resultsFrame_standalone)
+        infoLabel.Name = lblData.Name .. "Label"; infoLabel.Size = UDim2.new(0.95, 0, 0, (lblData.IsTitle or lblData.Name == "Status") and 20 or 18) 
+        infoLabel.BackgroundTransparency = 1; infoLabel.TextColor3 = lblData.TextColor or Color3.fromRGB(200, 200, 200)
+        infoLabel.Text = lblData.Placeholder; infoLabel.Font = lblData.IsTitle and Enum.Font.SourceSansSemibold or Enum.Font.SourceSans
+        infoLabel.TextSize = lblData.TextSize or (lblData.IsTitle and 14 or 13)
+        infoLabel.TextXAlignment = lblData.IsTitle and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
+        infoLabel.TextWrapped = true; infoLabel.LayoutOrder = currentLayoutOrder; infoLabels_standalone[lblData.Name] = infoLabel 
+        currentLayoutOrder = currentLayoutOrder + 1
+    end
+
+    searchButton.MouseButton1Click:Connect(PerformLookup_standalone)
+    countryNameInput_standalone.FocusLost:Connect(function(enterPressed) if enterPressed then PerformLookup_standalone() end end)
+    closeButton.MouseButton1Click:Connect(function() if countryLookupScreenGui_standalone then countryLookupScreenGui_standalone.Parent = nil; countryLookupScreenGui_standalone:Destroy(); countryLookupScreenGui_standalone = nil; print("Standalone GUI Destroyed.") end end)
+
+    print("LOADSTRING: Country Lookup GUI (Real Data v1.4.1) - Created. Enabled:", countryLookupScreenGui_standalone.Enabled)
+    
+    task.wait() 
+    if resultsFrame_standalone and uiListLayout_standalone then
+        resultsFrame_standalone.CanvasSize = UDim2.fromOffset(0, uiListLayout_standalone.AbsoluteContentSize.Y + 10)
+    end
+end
+
+if PlayerGui:FindFirstChild("CountryLookupGUI_Standalone") then
+    PlayerGui:FindFirstChild("CountryLookupGUI_Standalone"):Destroy() 
+end
+CreateCountryLookupGUI_Standalone()
